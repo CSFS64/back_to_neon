@@ -44,9 +44,9 @@ a.inline-link {
   text-underline-offset: 2px;
   text-decoration-thickness: 2px;
   padding: 1px 2px;
-  border-radius: 2px;
-  -webkit-tap-highlight-color: transparent;  /* iOS 长按高亮去除，避免叠色 */
-  transition: color .06s ease, outline .01s linear;
+  border-radius: 0; /* 去掉虚线外框的圆角 */
+  -webkit-tap-highlight-color: transparent; /* 禁止iOS灰色高亮 */
+  transition: none; /* 禁止淡入淡出动画 */
 }
 /* 悬停/聚焦：虚线外框（与全站风格一致），不填充背景 */
 a.inline-link:hover,
