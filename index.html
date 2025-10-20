@@ -19,20 +19,13 @@
           <span class="sub">Open-Source Intelligence Group</span>
         </div>
 
-        <div class="webring center">
-          <a href="#about">About</a> |
-          <a href="#projects">Projects</a> |
-          <a href="#recruit">Recruiting</a> |
-          <a href="#contact">Contact</a> |
-          <a href="#faq">FAQ</a>
-        </div>
-
+        <!-- 顶部“多余导航”已移除；仅保留移动端菜单开关 -->
         <div class="mobile-menu center">
           <a href="#menu" id="menuToggle" class="menu-link" aria-expanded="false" aria-controls="sidebar">☰ 打开导航（文字）</a>
         </div>
 
         <marquee behavior="scroll" direction="left" scrollamount="3" class="ticker">
-          ★ 欢迎访问 ABC OSINT 导航与招募页（复古终端风）★ 全站为纯文字链接 + 高信息密度布局 ★
+          ★ 欢迎访问 ABC OSINT 导航与招募页（复古终端风）★ 纯文字链接 + 高信息密度布局 ★
         </marquee>
         <marquee behavior="alternate" scrollamount="2" class="ticker alt">
           ► Open Data • Open Methods • Open Collaboration ◄
@@ -50,23 +43,27 @@
         <div class="nav-box">
           <div class="nav-title">导航（Navigation）</div>
           <ul class="nav-list">
-            <li><a href="#about">关于我们（About）</a></li>
-            <li><a href="#projects">项目与网站（Projects）</a></li>
-            <li><a href="#contrib">如何参与（Contribute）</a></li>
-            <li><a href="#recruit">加入我们（Recruiting）</a></li>
-            <li><a href="#contact">联系（Contact）</a></li>
-            <li><a href="#faq">常见问题（FAQ）</a></li>
-            <li><a href="#sitemap">站点地图（Sitemap）</a></li>
+            <li><a href="#about" class="linkbox">关于我们（About）</a></li>
+            <li><a href="#projects" class="linkbox">项目与网站（Projects）</a></li>
+            <li><a href="#contrib" class="linkbox">如何参与（Contribute）</a></li>
+            <li><a href="#recruit" class="linkbox">加入我们（Recruiting）</a></li>
+            <li><a href="#contact" class="linkbox">联系（Contact）</a></li>
+            <li><a href="#faq" class="linkbox">常见问题（FAQ）</a></li>
+            <li><a href="#sitemap" class="linkbox">站点地图（Sitemap）</a></li>
           </ul>
         </div>
 
         <div class="nav-box">
           <div class="nav-title">快速入口（Quick Links）</div>
           <p>
-            前线时间机：<a href="https://csfs64.github.io/test2/" target="_blank" rel="noopener">Frontline Viewer</a><br>
-            轻量社交：<a href="https://csfs64.github.io/hub/#" target="_blank" rel="noopener">Hub / Micro-Posts</a><br>
-            招募说明：<a href="#recruit">Recruiting</a><br>
-            发邮件：<a href="#contact">Contact</a>
+            <a class="linkbox" href="https://csfs64.github.io/test2/" target="_blank" rel="noopener">
+              打开「前线时间机」查看不同日期的前线变化
+            </a><br>
+            <a class="linkbox" href="https://csfs64.github.io/hub/#" target="_blank" rel="noopener">
+              进入「Hub 帖子流」发布/查看简短更新
+            </a><br>
+            <a class="linkbox" href="#recruit">查看招募要求</a><br>
+            邮箱：<a href="mailto:plus20dallors@gmail.com">plus20dallors@gmail.com</a>
           </p>
         </div>
 
@@ -91,69 +88,59 @@
           <h2 id="about">关于我们（About）</h2>
           <p class="intro">
             ABC OSINT 是一个开源战争分析小组：我们使用公开来源的数据（卫星图、官方公报、媒体素材、志愿者记录等），
-            以可复核的流程复原与跟踪战场态势。我们坚持 <a href="#principles">公开数据</a>、
-            <a href="#principles">公开方法</a>、<a href="#principles">可重复验证</a>。
-            本页为“导航枢纽”，统一指向我们不同功能的网站，并提供参与方式与招募信息。
+            以可复核的流程复原与跟踪战场态势。我们坚持公开数据、公开方法与可重复验证。
+            本页统一指向我们的各类工具与网站，并提供参与方式与招募信息。
           </p>
 
-          <!-- 项目 -->
+          <!-- 项目（不露 URL，仅“整句可点”） -->
           <h2 id="projects">项目与网站（Projects）</h2>
           <ul class="dense-list">
             <li>
-              <b>Frontline Viewer — 前线时间机</b>：
-              不同日期前线的可视化浏览与对比，支持按日期切换、观察线型变化与接触带范围。
-              入口：<a href="https://csfs64.github.io/test2/" target="_blank" rel="noopener">https://csfs64.github.io/test2/</a>。
-              <br>使用建议：在桌面端打开可获得更大视域；建议配合“标注/截图”工具记录变化。
+              <a class="linkbox" href="https://csfs64.github.io/test2/" target="_blank" rel="noopener">
+                前线时间机：按日期切换，纵览前线演变（推荐桌面端大视域）
+              </a>
             </li>
             <li>
-              <b>Hub — 轻量社交</b>：
-              类推特的简化帖子流，用于快速发布现场梳理、图注、链接与更正，便于志愿者协作与订阅更新。
-              入口：<a href="https://csfs64.github.io/hub/#" target="_blank" rel="noopener">https://csfs64.github.io/hub/#</a>。
-              <br>使用建议：标签用于归档主题（例：#logistics、#airdefense、#bridge、#frontline-delta）。
+              <a class="linkbox" href="https://csfs64.github.io/hub/#" target="_blank" rel="noopener">
+                Hub 帖子流：快速发布现场梳理、图注、链接与更正
+              </a>
             </li>
           </ul>
 
-          <!-- 如何参与 -->
+          <!-- 参与 -->
           <h2 id="contrib">如何参与（Contribute）</h2>
           <p>
-            志愿者可以从以下角色入手：<br>
-            • <b>数据查证</b>：对坐标、影像来源、时间戳进行交叉验证；<br>
-            • <b>制图与标注</b>：将变化点转换为标准化图层（GeoJSON/CSV）；<br>
-            • <b>情报梳理</b>：把多来源线索整理成“事件时间线”；<br>
-            • <b>前端/后端</b>：改进可视化与数据接口（见下方“招募特别需要”）。<br>
-            我们欢迎任何对开源分析有兴趣的人，以可复核方式提交证据链。
+            志愿者可从以下角色入手：数据查证、制图与标注、情报梳理、前后端开发。欢迎任何对 OSINT 感兴趣的人加入。
           </p>
 
           <!-- 招募 -->
           <h2 id="recruit">加入我们（Recruiting）</h2>
-          <p><b>我们长期招募开源分析志愿者，特别偏好能把自己正在做的“前后端项目”与我们工具链结合的人。</b></p>
-          <p>通用要求（任选其一或多项）：</p>
+          <p><b>长期招募：</b>通用要求（具备其一或多项）：</p>
           <ul class="dense-list">
-            <li>愿意按照“证据-引用-结论”的格式输出材料，能够被别人复核与复现；</li>
-            <li>有基本的地图/航照判读能力，或愿意学习（矢量化、坐标定位、面/线/点标注）；</li>
-            <li>能进行信息去重、版本对比、来源可靠性分级；</li>
-            <li>英文/多语资料检索与摘要归纳能力。</li>
+            <li>能按“证据-引用-结论”格式输出，材料可复核与复现；</li>
+            <li>具备地图/航照判读基础或愿意学习（矢量化、坐标定位、线/面/点标注）；</li>
+            <li>能进行信息去重、时间线对齐、来源可靠性分级；</li>
+            <li>英文/多语检索与摘要能力。</li>
           </ul>
-          <p>特别需要（技术向，任选其一）：</p>
+          <p><b>特别需要（可与我们现有/计划中的工具链直接联动）：</b></p>
           <ul class="dense-list">
-            <li><b>前端</b>：能用 Leaflet/MapLibre、Canvas/WebGL 做时间轴切换、差异高亮、热区标注；</li>
-            <li><b>后端</b>：能设计简单的只读 API（JSON/GeoJSON），做增量数据发布与快照版本；</li>
-            <li><b>数据工程</b>：能把志愿者标注规范化（校验坐标/拓扑），产出可合并的 PR；</li>
-            <li><b>整合项目</b>：你已有的前后端项目可与我们互联（示例：<i>战损清单可视化、补给线推断、桥梁/渡口状态数据库、机场跑道修复跟踪、FPV 击杀地理分布</i>）。</li>
+            <li><b>前端</b>：Leaflet/MapLibre、Canvas/WebGL；实现日期时间轴、差异高亮、热区标注；</li>
+            <li><b>后端</b>：设计只读 API（JSON/GeoJSON）、增量数据发布与快照版本；</li>
+            <li><b>数据工程</b>：志愿者标注规范化（坐标/拓扑校验）、批量导入导出；</li>
+            <li><b>可联动示例</b>：战损清单可视化、补给线推断、桥梁/渡口状态库、机场跑道修复跟踪、FPV 打击地理分布。</li>
           </ul>
-          <p>提交时请<b>附上可运行的演示链接或仓库</b>，并简单说明如何与 Frontline/Hub 互通（数据格式/接口/嵌入方式）。</p>
+          <p>提交时请<b>附上可运行的 Demo 或仓库</b>，并简述如何与 Frontline/Hub 互通（数据格式/接口/嵌入方式）。</p>
 
           <!-- 联系 -->
           <h2 id="contact">联系（Contact）</h2>
           <p>
-            邮箱：<a href="mailto:plus20dallors@gmail.com">plus20dallors@gmail.com</a><br>
-            为便于分拣，请使用以下<b>邮件主题规范</b>：
+            邮箱：<a href="mailto:plus20dallors@gmail.com">plus20dallors@gmail.com</a>
           </p>
+          <p>为便于分拣，请使用以下<b>邮件主题规范</b>（邮箱可直接点）：</p>
           <ul class="dense-list">
-            <li><b>[Feedback] ABC OSINT —&nbsp;</b>一句话概括（例如：<i>Frontline 日期切换建议</i>）</li>
-            <li><b>[Application] ABC OSINT —&nbsp;</b>你的姓名 / 擅长（例如：<i>张三 / 前端可视化</i>）</li>
+            <li><b>[Feedback] ABC OSINT —&nbsp;</b>一句话概括（例：Frontline 日期切换建议）</li>
+            <li><b>[Application] ABC OSINT —&nbsp;</b>姓名 / 擅长（例：张三 / 前端可视化）</li>
           </ul>
-
           <p><b>邮件正文模板（复制即可）：</b></p>
           <pre>
 【反馈 Feedback】
@@ -170,40 +157,29 @@ Subject: [Feedback] ABC OSINT — （一句话概括）
 Subject: [Application] ABC OSINT — 姓名 / 擅长领域
 正文：
 - 基本介绍（城市/时区、可投入时间）：
-- 能力与经验（前端/后端/数据/制图等，附仓库或 Demo 链接）：
+- 能力与经验（前端/后端/数据/制图等，附仓库/演示链接）：
 - 与 ABC OSINT 互联设想（数据格式/接口/嵌入方式）：
 - 过往 OSINT 实例（可选，注意去敏）：
 ——
 简历链接（可选）：
-            </pre>
-
-          <!-- FAQ -->
-          <h2 id="faq">常见问题（FAQ）</h2>
-          <p>
-            Q: 你们的数据可靠吗？<br>
-            A: 数据来自公开来源，所有结论均要求“可追溯引用 + 可复核过程”。我们欢迎任何基于新证据的更正。
-          </p>
-          <p>
-            Q: 没有技术背景可以加入吗？<br>
-            A: 当然。查证、时间线梳理、标注与编辑都需要人手，我们提供规范与模板。
-          </p>
+          </pre>
 
           <!-- 站点地图 -->
           <div class="hr-gif"></div>
           <h2 id="sitemap">站点地图（Sitemap）</h2>
           <ul class="sitemap">
-            <li><a href="#about">关于我们</a></li>
-            <li><a href="#projects">项目与网站</a></li>
-            <li><a href="#contrib">如何参与</a></li>
-            <li><a href="#recruit">加入我们</a></li>
-            <li><a href="#contact">联系</a></li>
-            <li><a href="#faq">常见问题</a></li>
+            <li><a class="linkbox" href="#about">关于我们</a></li>
+            <li><a class="linkbox" href="#projects">项目与网站</a></li>
+            <li><a class="linkbox" href="#contrib">如何参与</a></li>
+            <li><a class="linkbox" href="#recruit">加入我们</a></li>
+            <li><a class="linkbox" href="#contact">联系</a></li>
+            <li><a class="linkbox" href="#faq">常见问题</a></li>
           </ul>
 
           <!-- 访问计数器 -->
           <p class="center counter">Visitors: <tt id="hitCounter">[000001]</tt></p>
           <p class="last-updated center">
-            Last updated: <span id="lastUpdated">—</span> • Best viewed at <b>1024×768</b>
+            Last updated: <span id="lastUpdated">—</span>
           </p>
         </div>
       </td>
@@ -213,7 +189,7 @@ Subject: [Application] ABC OSINT — 姓名 / 擅长领域
       <td colspan="2" class="footer">
         <p>
           版权所有 © <span id="year">—</span> ABC OSINT. 本页面为“复古终端风实验”。<br>
-          <a href="#about">About</a> | <a href="#projects">Projects</a> | <a href="#recruit">Recruiting</a> | <a href="#contact">Contact</a>
+          <a href="#about" class="linkbox">About</a> | <a href="#projects" class="linkbox">Projects</a> | <a href="#recruit" class="linkbox">Recruiting</a> | <a href="#contact" class="linkbox">Contact</a>
         </p>
       </td>
     </tr>
