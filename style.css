@@ -1,39 +1,82 @@
-/* 终端字体与基础：保持你当前版本，其它不变，只展示关键差异段 */
-/* —— 如果你之前用了我的“终端版 styles.css”，直接把下面这几段合并进去即可 —— */
-
-/* 1) 统一为等宽终端字体（若已存在可忽略） */
-:root{
-  --mono-stack: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
-                "Liberation Mono", "Lucida Console", "DejaVu Sans Mono",
-                "Courier New", monospace;
+/* ========== 基础终端风 ========== */
+:root {
+  --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+          "Liberation Mono", "Lucida Console", "DejaVu Sans Mono",
+          "Courier New", monospace;
 }
-html, body { font-family: var(--mono-stack); }
 
-/* 2) 链接基础（蓝/紫 + 下划线） */
-a {
-  color: #005fa3;                 /* 稍深一点的蓝，像老门户 */
+html, body {
+  font-family: var(--mono);
+  margin: 0;
+  padding: 0;
+  background: #fff;
+  color: #000;
+  line-height: 1.5;
+}
+
+/* 背景网格 */
+.bg-tiles {
+  background-image:
+    repeating-linear-gradient(0deg, rgba(0,0,0,0.03) 0, rgba(0,0,0,0.03) 1px, transparent 1px, transparent 8px),
+    repeating-linear-gradient(90deg, rgba(0,0,0,0.03) 0, rgba(0,0,0,0.03) 1px, transparent 1px, transparent 8px);
+}
+
+/* 主内容 */
+.main {
+  max-width: 800px;
+  margin: 40px auto;
+  padding: 20px;
+}
+h1 {
+  border-bottom: 2px solid #000;
+  padding-bottom: 4px;
+  font-size: 22px;
+}
+h2 {
+  margin-top: 32px;
+  font-size: 18px;
+}
+
+/* 段落 */
+p {
+  text-align: justify;
+  margin: 12px 0;
+}
+
+/* ========== 链接风格 ========== */
+a.inline-link {
+  color: #005fa3;
   text-decoration: underline;
   text-underline-offset: 2px;
-}
-
-/* 3) “蓝框交互感” —— hover/focus/active 时出现蓝色方框 + 浅蓝底 */
-a.linkbox, .content a.linkbox, .sidebar a.linkbox {
-  /* 基础还是文本外观；需要时可加内边距不影响排版 */
   padding: 1px 2px;
-  border-radius: 2px;             /* 轻微圆角，保持复古硬朗 */
-  transition: box-shadow .05s linear, background-color .05s linear, outline-color .05s linear;
-}
-a.linkbox:hover,
-a.linkbox:focus {
-  outline: 2px solid #0093b3;     /* 蓝框（不挤占布局） */
-  outline-offset: 1px;
-  background-color: #e6f8ff;      /* 浅蓝底 */
-}
-a.linkbox:active {
-  outline: 2px solid #007c99;
-  outline-offset: 0;              /* 点击时更贴近文字，模拟“按下” */
-  background-color: #d6f0ff;
+  border-radius: 2px;
+  transition: background-color .1s ease, outline .1s ease;
 }
 
-/* 其余样式保持你现有文件：侧栏、跑马灯、hr-gif、footer、移动端适配… */
-/* 如果需要完整样式，我也可以把你的“终端版 styles.css”整合好后整文件贴给你 */
+/* 悬停仅变色 */
+a.inline-link:hover {
+  color: #007acc;
+  background-color: #eaf6ff;
+}
+
+/* 点击时出现蓝框 */
+a.inline-link:active {
+  outline: 2px solid #0093b3;
+  outline-offset: 1px;
+  background-color: #d9f2ff;
+}
+
+/* 访问后颜色保持一致 */
+a.inline-link:visited {
+  color: #005fa3;
+}
+
+/* ========== 页脚 ========== */
+footer {
+  margin-top: 40px;
+  border-top: 1px solid #000;
+  padding-top: 10px;
+  text-align: center;
+  font-size: 14px;
+  color: #333;
+}
