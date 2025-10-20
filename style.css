@@ -1,116 +1,160 @@
+/* ===============================
+   复古加料：高信息密度 + 纯文字链接 + 老门户味
+   移动端仍可用；无外部资源。
+   =============================== */
+
+/* 老式字体栈 + 轻微行高 */
 html, body {
-  margin: 0;
-  padding: 0;
-  background: #ffffff;
-  color: #000000;
+  margin: 0; padding: 0;
+  background: #ffffff; color: #000;
   font-family: "Times New Roman", Times, serif;
-  line-height: 1.35;
+  line-height: 1.4;
+  -webkit-text-size-adjust: 100%;
 }
 
-a {
-  color: #0000EE;
-  text-decoration: underline;
+/* 背景：细微瓷砖纹理（无图，CSS 生成） */
+.bg-tiles {
+  background-image:
+    repeating-linear-gradient(0deg, rgba(0,0,0,0.03) 0, rgba(0,0,0,0.03) 1px, transparent 1px, transparent 8px),
+    repeating-linear-gradient(90deg, rgba(0,0,0,0.03) 0, rgba(0,0,0,0.03) 1px, transparent 1px, transparent 8px);
 }
+
+/* 蓝色下划线链接 + 访问后紫色（经典） */
+a { color: #0000EE; text-decoration: underline; }
 a:visited { color: #551A8B; }
 a:focus, a:hover { outline: 1px dotted #000; }
 
+/* 跳主内容（无障碍） */
+.skip-link { position: absolute; left: -9999px; top: -9999px; }
+.skip-link:focus {
+  left: 8px; top: 8px; background: #ff0; color: #000;
+  padding: 4px 6px; border: 1px solid #000;
+}
+
+/* 表格布局（桌面优先） */
 table.layout { width: 100%; border-collapse: collapse; }
+.banner-row .banner { background: #e5e5e5; border-bottom: 2px solid #000; }
 
-.banner-row .banner {
-  background: #e5e5e5;
-  border-bottom: 2px solid #000;
-}
+.center { text-align: center; }
 
-.logo-area {
-  padding: 8px 12px 4px;
-  font-size: 18px;
-}
+.logo-area { padding: 8px 12px 4px; font-size: 20px; }
 .logo-area .dept { font-weight: bold; }
-.logo-area .sub {
-  margin-left: 8px;
-  font-style: italic;
-  font-size: 14px;
-  color: #333;
-}
+.logo-area .sub { margin-left: 8px; font-style: italic; font-size: 14px; color: #333; }
 
+/* WeBring */
+.webring { padding: 4px 8px; font-size: 13px; }
+
+/* 跑马灯条 */
 .ticker {
   background: #f5f5f5;
-  border-top: 1px solid #000;
-  border-bottom: 1px solid #000;
-  padding: 4px 8px;
-  font-size: 13px;
+  border-top: 1px solid #000; border-bottom: 1px solid #000;
+  padding: 4px 8px; font-size: 13px;
 }
+.ticker.alt { background: #f0f0f0; }
 
+/* Under Construction 横幅 + 伪 blink */
+.under-construction {
+  text-align: center; font-weight: bold;
+  padding: 6px 8px; border-bottom: 2px solid #000;
+  background: #fff9d6;
+}
+.blink { animation: blink 1.2s steps(2, jump-none) infinite; }
+@keyframes blink { 50% { opacity: 0; } }
+
+/* 移动端菜单 */
+.mobile-menu { padding: 4px 8px; }
+.menu-link { font-weight: bold; }
+
+/* 侧栏（桌面） */
 .sidebar {
-  width: 260px;
-  border-right: 1px solid #000;
-  background: #fafafa;
-  padding: 8px;
+  width: 260px; vertical-align: top;
+  border-right: 1px solid #000; background: #fafafa; padding: 8px;
 }
+.nav-box { border: 1px solid #000; padding: 6px 8px; margin-bottom: 10px; background: #fff; }
+.nav-title { font-weight: bold; border-bottom: 1px solid #000; margin-bottom: 6px; }
+.nav-list { list-style: square inside; margin: 0; padding: 0; }
+.nav-list li { margin: 4px 0; }
 
-.nav-box {
-  border: 1px solid #000;
-  padding: 6px 8px;
-  margin-bottom: 10px;
-  background: #fff;
-}
-.nav-title {
-  font-weight: bold;
-  border-bottom: 1px solid #000;
-  margin-bottom: 6px;
-}
-.nav-list { list-style: square inside; }
+/* 触控友好：不改变视觉而增大点击区 */
+.sidebar a, .content a { padding: 2px 1px; }
 
-.box.note {
-  border: 1px dashed #000;
-  padding: 6px 8px;
-  background: #fdf7d7;
-  font-size: 13px;
-}
+/* 徽章区域 */
+.badges { margin-top: 8px; }
+.badge { width: 88px; height: 31px; image-rendering: pixelated; margin: 2px; border: 1px solid #000; }
 
+/* 内容区 */
 .content { padding: 12px 16px; }
 .main h1 {
-  margin-top: 8px;
-  font-size: 24px;
-  border-bottom: 2px solid #000;
+  margin: 8px 0 2px; font-size: 24px; border-bottom: 2px solid #000;
 }
 .main h2 { font-size: 18px; margin-top: 18px; }
-.intro {
-  background: #f9f9f9;
-  border: 1px solid #000;
-  padding: 8px 10px;
-}
+.intro { background: #f9f9f9; border: 1px solid #000; padding: 8px 10px; }
+.dense-list { margin-top: 6px; }
 .dense-list li { margin: 2px 0; }
 
-.footer {
-  text-align: center;
-  border-top: 2px solid #000;
-  background: #efefef;
-  padding: 10px 6px 16px;
-  font-size: 12px;
+/* GIF 风味分隔线（纯 CSS） */
+.hr-gif {
+  height: 10px; margin: 8px 0 12px;
+  background-image: repeating-linear-gradient(90deg, #000 0, #000 2px, transparent 2px, transparent 6px);
+  opacity: .2;
 }
 
-body.contrast-high {
-  background: #000;
-  color: #0f0;
+/* 站点地图 */
+.sitemap { columns: 2; column-gap: 24px; }
+.sitemap li { break-inside: avoid; }
+
+/* 访问计数器风味 */
+.counter tt {
+  font-family: "Courier New", Courier, monospace;
+  font-size: 16px; letter-spacing: 2px; background: #000; color: #0f0;
+  padding: 2px 6px; border: 1px solid #0f0;
 }
+
+/* “最后更新/最佳浏览” */
+.last-updated { font-size: 12px; color: #333; }
+
+/* 页脚 */
+.footer {
+  text-align: center; border-top: 2px solid #000;
+  background: #efefef; padding: 10px 6px 16px; font-size: 12px;
+}
+
+/* 高对比度（H 切换） */
+body.contrast-high { background: #000; color: #0f0; }
 body.contrast-high a { color: #0ff; }
+body.contrast-high a:visited { color: #09f; }
 body.contrast-high .sidebar,
 body.contrast-high .nav-box,
 body.contrast-high .intro,
 body.contrast-high .footer,
-body.contrast-high .banner {
-  background: #000;
-  color: #0f0;
-  border-color: #0f0;
-}
-body.contrast-high .ticker {
-  background: #010;
-  border-color: #0f0;
-}
+body.contrast-high .banner { background: #000; color: #0f0; border-color: #0f0; }
+body.contrast-high .ticker { background: #010; border-color: #0f0; }
 
+/* 打印：保留正文、隐藏装饰 */
 @media print {
-  .sidebar, .ticker, .skip-link { display: none !important; }
+  .sidebar, .ticker, .skip-link, .mobile-menu, .under-construction, .badges, .webring { display: none !important; }
   .content { padding: 0; }
   a { color: #000; text-decoration: none; }
+}
+
+/* ===== 移动端增强：表格布局“堆叠成块” ===== */
+@media (max-width: 900px) {
+  html, body { font-size: 18px; line-height: 1.55; }
+
+  table.layout, table.layout tr, table.layout td { display: block; width: 100% !important; }
+  .sidebar { border-right: none; border-top: 1px solid #000; }
+
+  /* 侧栏默认折叠，通过 body.nav-open 展开 */
+  .sidebar { display: none; }
+  body.nav-open .sidebar { display: block; }
+
+  .nav-list li { margin: 8px 0; }
+  a { line-height: 1.6; }
+
+  .content { padding: 12px; }
+  .logo-area { font-size: 22px; }
+  .main h1 { font-size: 22px; }
+  .main h2 { font-size: 18px; }
+
+  .sitemap { columns: 1; }
 }
