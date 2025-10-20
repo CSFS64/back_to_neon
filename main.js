@@ -25,7 +25,7 @@
       position: 'fixed', right: '12px', bottom: '12px',
       border: '1px solid #000', background: '#fff',
       padding: '8px 10px', maxWidth: '320px',
-      fontFamily: '"Times New Roman", Times, serif',
+      fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Lucida Console", "DejaVu Sans Mono", "Courier New", monospace',
       fontSize: '14px', zIndex: 99999
     });
     document.body.appendChild(helpBox);
@@ -81,13 +81,13 @@
 
   // 假访问计数器（localStorage）
   try {
-    var key = 'retro_hits_v1';
+    var key = 'abc_osint_hits_v1';
     var count = parseInt(localStorage.getItem(key) || '0', 10) + 1;
     localStorage.setItem(key, String(count));
     var txt = '[' + String(count).padStart(6, '0') + ']';
     var el = document.getElementById('hitCounter');
     if (el) el.textContent = txt;
   } catch (e) {
-    // 隐身/禁用本地存储时，静默失败，保持初始值
+    /* 隐身/禁 JS 存储时静默忽略 */
   }
 })();
