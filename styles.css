@@ -30,34 +30,39 @@ html, body {
 
 /* 链接（默认蓝字+下划线） */
 a { color: #0000EE; text-decoration: underline; text-underline-offset: 2px; }
+a { text-decoration-thickness: 2px; }          /* 下划线更粗，便于匹配 active 边框 */
 a:visited { color: #551A8B; }
 a:focus, a:hover { outline: 1px dotted #000; }
 
-/* 行内链接：hover变色，active时蓝框 */
+/* ===== 行内链接交互（按你的新要求） =====
+   1) 悬停/聚焦：只变文字颜色（不填充底色）
+   2) 点击：出现更粗的蓝色外描边（厚度≈2px，与下划线一致）
+   3) 不要整段变黄（对应 JS 里已移除） */
 a.inline-link {
   color: #005fa3;
   text-decoration: underline;
   text-underline-offset: 2px;
-  padding: 1px 2px;
+  text-decoration-thickness: 2px;
+  padding: 1px 2px;            /* 给外描边留点空间 */
   border-radius: 2px;
-  transition: background-color .1s ease, outline .1s ease, color .1s ease;
+  transition: color .1s ease, outline .1s ease;
 }
 a.inline-link:hover,
 a.inline-link:focus {
-  outline: none;
-  color: #007acc;
-  background: #eaf6ff;
+  color: #007acc;              /* 仅变文字颜色 */
+  outline: none;               /* 不要虚线框 */
+  background: none;            /* 不填充底色 */
 }
 a.inline-link:active {
-  outline: 2px solid #0093b3;
+  outline: 2px solid #007acc;  /* 更粗的蓝色外描边 */
   outline-offset: 1px;
-  background: #d9f2ff;
+  background: none;
 }
 a.inline-link:visited { color: #005fa3; }
 
-/* 段落/列表之间的换行间距 */
+/* 段落/列表之间的换行间距：相邻 li 之间空一行 */
 .dense-list li + li {
-  margin-top: 1.4em;  /* 空一整行视觉效果 */
+  margin-top: 1.4em;
 }
 
 /* 跳主内容 */
@@ -79,7 +84,7 @@ table.layout { width: 100%; border-collapse: collapse; }
 .logo-area .dept { font-weight: 700; letter-spacing: .2px; }
 .logo-area .sub { margin-left: 8px; font-style: italic; font-size: 14px; color: #333; letter-spacing: .2px; }
 
-/* 顶部蓝色分栏导航 */
+/* ===== 顶部蓝色分栏导航（加强优先级） ===== */
 nav.topbar {
   display: flex !important;
   align-items: stretch;
@@ -90,7 +95,6 @@ nav.topbar {
   overflow-x: auto;
   position: sticky; top: 0; z-index: 100;
 }
-
 nav.topbar a.tab {
   display: inline-block;
   padding: 12px 18px;
@@ -102,17 +106,12 @@ nav.topbar a.tab {
   white-space: nowrap;
   border-right: 1px solid rgba(255,255,255,0.15);
 }
-nav.topbar a.tab:hover {
-  background: linear-gradient(180deg,#3688d8 0%, #2a73bb 100%);
-}
+nav.topbar a.tab:hover { background: linear-gradient(180deg,#3688d8 0%, #2a73bb 100%); }
 nav.topbar a.tab.active {
   background: linear-gradient(180deg,#1e5f99 0%, #184f81 100%);
   box-shadow: inset 0 2px 6px rgba(0,0,0,.35);
 }
-nav.topbar a.tab:focus {
-  outline: 2px solid #9fd7ff;
-  outline-offset: -2px;
-}
+nav.topbar a.tab:focus { outline: 2px solid #9fd7ff; outline-offset: -2px; }
 @media (max-width: 900px){
   nav.topbar a.tab { padding: 10px 14px; }
 }
@@ -134,11 +133,31 @@ nav.topbar a.tab:focus {
 .blink { animation: blink 1.2s steps(2, jump-none) infinite; }
 @keyframes blink { 50% { opacity: 0; } }
 
-/* 侧栏 */
+/* ===== 侧栏（桌面 sticky、移动默认隐藏） ===== */
 .sidebar {
-  width: 260px; vertical-align: top;
-  border-right: 1px solid #000; background: #fafafa; padding: 8px;
+  width: 260px;
+  vertical-align: top;
+  border-right: 1px solid #000;
+  background: #fafafa;
+  padding: 8px;
 }
+
+/* 桌面：侧栏吸顶并可独立滚动 */
+@media (min-width: 901px) {
+  .sidebar {
+    position: sticky;
+    top: 0;              /* 与顶部导航贴齐 */
+    height: 100vh;       /* 固定在视口高度 */
+    overflow: auto;      /* 侧栏内容可滚动 */
+  }
+}
+
+/* 移动：侧栏默认隐藏，点击开/关 */
+@media (max-width: 900px) {
+  .sidebar { display: none !important; }
+  body.nav-open .sidebar { display: block !important; }
+}
+
 .nav-box { border: 1px solid #000; padding: 6px 8px; margin-bottom: 10px; background: #fff; }
 .nav-title { font-weight: 700; border-bottom: 1px solid #000; margin-bottom: 6px; letter-spacing: .2px; }
 .nav-list { list-style: square inside; margin: 0; padding: 0; }
@@ -157,9 +176,7 @@ nav.topbar a.tab:focus {
 }
 
 /* 高对比度模式 */
-body.contrast-high {
-  background: #000; color: #0f0;
-}
+body.contrast-high { background: #000; color: #0f0; }
 body.contrast-high a { color: #0ff; }
 body.contrast-high a:visited { color: #09f; }
 body.contrast-high .sidebar,
@@ -183,8 +200,6 @@ body.contrast-high .ticker { background: #010; border-color: #0f0; }
   html, body { font-size: 18px; line-height: 1.55; }
   table.layout, table.layout tr, table.layout td { display: block; width: 100% !important; }
   .sidebar { border-right: none; border-top: 1px solid #000; }
-  .sidebar { display: none; }
-  body.nav-open .sidebar { display: block; }
   .nav-list li { margin: 8px 0; }
   a { line-height: 1.6; }
   .content { padding: 12px; }
