@@ -1,17 +1,18 @@
 /* ===============================
-   ABC OSINT 导航 — 复古终端风 + 移动端适配 + 无外链资源
+   ABC OSINT 导航 — 复古终端风 + 蓝色导航栏 + 段落间距优化
    =============================== */
 
-/* 终端等宽字体栈（系统原生） */
-:root{
+/* 终端等宽字体栈 */
+:root {
   --mono-stack: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
-                "Liberation Mono", "Lucida Console", "DejaVu Sans Mono",
-                "Courier New", monospace;
+    "Liberation Mono", "Lucida Console", "DejaVu Sans Mono", "Courier New", monospace;
 }
 
 html, body {
-  margin: 0; padding: 0;
-  background: #ffffff; color: #000;
+  margin: 0;
+  padding: 0;
+  background: #ffffff;
+  color: #000;
   font-family: var(--mono-stack);
   line-height: 1.4;
   -webkit-text-size-adjust: 100%;
@@ -20,26 +21,56 @@ html, body {
   -moz-osx-font-smoothing: auto;
 }
 
-/* 背景瓷砖纹理（纯 CSS） */
+/* 背景瓷砖纹理 */
 .bg-tiles {
   background-image:
     repeating-linear-gradient(0deg, rgba(0,0,0,0.03) 0, rgba(0,0,0,0.03) 1px, transparent 1px, transparent 8px),
     repeating-linear-gradient(90deg, rgba(0,0,0,0.03) 0, rgba(0,0,0,0.03) 1px, transparent 1px, transparent 8px);
 }
 
-/* 链接：蓝色/紫色 + 终端感下划线 */
+/* 链接（默认蓝字+下划线） */
 a { color: #0000EE; text-decoration: underline; text-underline-offset: 2px; }
 a:visited { color: #551A8B; }
 a:focus, a:hover { outline: 1px dotted #000; }
 
+/* 行内链接：hover变色，active时蓝框 */
+a.inline-link {
+  color: #005fa3;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  padding: 1px 2px;
+  border-radius: 2px;
+  transition: background-color .1s ease, outline .1s ease, color .1s ease;
+}
+a.inline-link:hover,
+a.inline-link:focus {
+  outline: none;
+  color: #007acc;
+  background: #eaf6ff;
+}
+a.inline-link:active {
+  outline: 2px solid #0093b3;
+  outline-offset: 1px;
+  background: #d9f2ff;
+}
+a.inline-link:visited { color: #005fa3; }
+
+/* 段落/列表之间的换行间距 */
+.dense-list li + li {
+  margin-top: 1.4em;  /* 空一整行视觉效果 */
+}
+
 /* 跳主内容 */
-.skip-link { position: absolute; left: -9999px; top: -9999px; }
+.skip-link {
+  position: absolute; left: -9999px; top: -9999px;
+}
 .skip-link:focus {
-  left: 8px; top: 8px; background: #ff0; color: #000;
+  left: 8px; top: 8px;
+  background: #ff0; color: #000;
   padding: 4px 6px; border: 1px solid #000;
 }
 
-/* 表格布局（桌面优先） */
+/* 表格布局 */
 table.layout { width: 100%; border-collapse: collapse; }
 .banner-row .banner { background: #e5e5e5; border-bottom: 2px solid #000; }
 .center { text-align: center; }
@@ -48,8 +79,43 @@ table.layout { width: 100%; border-collapse: collapse; }
 .logo-area .dept { font-weight: 700; letter-spacing: .2px; }
 .logo-area .sub { margin-left: 8px; font-style: italic; font-size: 14px; color: #333; letter-spacing: .2px; }
 
-/* WeBring */
-.webring { padding: 4px 8px; font-size: 13px; }
+/* 顶部蓝色分栏导航 */
+nav.topbar {
+  display: flex !important;
+  align-items: stretch;
+  background: linear-gradient(180deg,#2b79c2 0%, #2267a8 100%) !important;
+  border-top: 1px solid #1e5e97;
+  border-bottom: 1px solid #0f3f68;
+  padding: 0;
+  overflow-x: auto;
+  position: sticky; top: 0; z-index: 100;
+}
+
+nav.topbar a.tab {
+  display: inline-block;
+  padding: 12px 18px;
+  color: #fff !important;
+  text-decoration: none !important;
+  font-weight: 700;
+  letter-spacing: .5px;
+  text-transform: uppercase;
+  white-space: nowrap;
+  border-right: 1px solid rgba(255,255,255,0.15);
+}
+nav.topbar a.tab:hover {
+  background: linear-gradient(180deg,#3688d8 0%, #2a73bb 100%);
+}
+nav.topbar a.tab.active {
+  background: linear-gradient(180deg,#1e5f99 0%, #184f81 100%);
+  box-shadow: inset 0 2px 6px rgba(0,0,0,.35);
+}
+nav.topbar a.tab:focus {
+  outline: 2px solid #9fd7ff;
+  outline-offset: -2px;
+}
+@media (max-width: 900px){
+  nav.topbar a.tab { padding: 10px 14px; }
+}
 
 /* 跑马灯 */
 .ticker {
@@ -59,7 +125,7 @@ table.layout { width: 100%; border-collapse: collapse; }
 }
 .ticker.alt { background: #f0f0f0; }
 
-/* Under Construction + 伪 blink */
+/* Under Construction + 闪烁 */
 .under-construction {
   text-align: center; font-weight: 700;
   padding: 6px 8px; border-bottom: 2px solid #000;
@@ -67,10 +133,6 @@ table.layout { width: 100%; border-collapse: collapse; }
 }
 .blink { animation: blink 1.2s steps(2, jump-none) infinite; }
 @keyframes blink { 50% { opacity: 0; } }
-
-/* 顶部移动菜单 */
-.mobile-menu { padding: 4px 8px; }
-.menu-link { font-weight: 700; }
 
 /* 侧栏 */
 .sidebar {
@@ -82,39 +144,11 @@ table.layout { width: 100%; border-collapse: collapse; }
 .nav-list { list-style: square inside; margin: 0; padding: 0; }
 .nav-list li { margin: 4px 0; }
 
-/* 触控友好：不改变视觉而增大点击区 */
-.sidebar a, .content a { padding: 2px 1px; }
-
-/* 徽章 */
-.badges { margin-top: 8px; }
-.badge { width: 88px; height: 31px; image-rendering: pixelated; margin: 2px; border: 1px solid #000; }
-
 /* 内容区 */
 .content { padding: 12px 16px; }
 .main h1 { margin: 8px 0 2px; font-size: 24px; border-bottom: 2px solid #000; letter-spacing: .2px; }
 .main h2 { font-size: 18px; margin-top: 18px; letter-spacing: .2px; }
 .intro { background: #f9f9f9; border: 1px solid #000; padding: 8px 10px; }
-.dense-list { margin-top: 6px; }
-.dense-list li { margin: 2px 0; }
-.hr-gif {
-  height: 10px; margin: 8px 0 12px;
-  background-image: repeating-linear-gradient(90deg, #000 0, #000 2px, transparent 2px, transparent 6px);
-  opacity: .2;
-}
-
-/* 站点地图 */
-.sitemap { columns: 2; column-gap: 24px; }
-.sitemap li { break-inside: avoid; }
-
-/* 访问计数器：终端绿屏味 */
-.counter tt {
-  font-family: var(--mono-stack);
-  font-size: 16px; letter-spacing: 2px; background: #000; color: #0f0;
-  padding: 2px 6px; border: 1px solid #0f0;
-}
-
-/* 更新信息 */
-.last-updated { font-size: 12px; color: #333; }
 
 /* 页脚 */
 .footer {
@@ -122,8 +156,10 @@ table.layout { width: 100%; border-collapse: collapse; }
   background: #efefef; padding: 10px 6px 16px; font-size: 12px;
 }
 
-/* 高对比度模式（H）与可选 CRT 主题 */
-body.contrast-high { background: #000; color: #0f0; }
+/* 高对比度模式 */
+body.contrast-high {
+  background: #000; color: #0f0;
+}
 body.contrast-high a { color: #0ff; }
 body.contrast-high a:visited { color: #09f; }
 body.contrast-high .sidebar,
@@ -133,23 +169,22 @@ body.contrast-high .footer,
 body.contrast-high .banner { background: #000; color: #0f0; border-color: #0f0; }
 body.contrast-high .ticker { background: #010; border-color: #0f0; }
 
-/* 打印：保留正文、隐藏装饰 */
+/* 打印隐藏多余元素 */
 @media print {
-  .sidebar, .ticker, .skip-link, .mobile-menu, .under-construction, .badges, .webring { display: none !important; }
+  .sidebar, .ticker, .skip-link, .mobile-menu, .under-construction, .badges, .webring {
+    display: none !important;
+  }
   .content { padding: 0; }
   a { color: #000; text-decoration: none; }
 }
 
-/* 移动端：把表格布局堆叠成块 */
+/* 移动端布局堆叠 */
 @media (max-width: 900px) {
   html, body { font-size: 18px; line-height: 1.55; }
   table.layout, table.layout tr, table.layout td { display: block; width: 100% !important; }
   .sidebar { border-right: none; border-top: 1px solid #000; }
-
-  /* 侧栏默认折叠，用 body.nav-open 控制 */
   .sidebar { display: none; }
   body.nav-open .sidebar { display: block; }
-
   .nav-list li { margin: 8px 0; }
   a { line-height: 1.6; }
   .content { padding: 12px; }
@@ -157,53 +192,4 @@ body.contrast-high .ticker { background: #010; border-color: #0f0; }
   .main h1 { font-size: 22px; }
   .main h2 { font-size: 18px; }
   .sitemap { columns: 1; }
-}
-
-/* ===== 顶部蓝色分栏导航 ===== */
-.topbar{
-  display: flex;
-  align-items: stretch;
-  gap: 0;                       /* 紧贴排列，像分栏 */
-  background: linear-gradient(180deg,#2b79c2 0%, #2267a8 100%); /* 蓝色底条 */
-  padding: 0;                   /* 与图一致的紧凑条 */
-  border-top: 1px solid #1e5e97;
-  border-bottom: 1px solid #0f3f68;
-  overflow-x: auto;             /* 小屏可横向滚动 */
-}
-
-.topbar .tab{
-  display: inline-block;
-  padding: 12px 18px;
-  color: #fff;
-  text-decoration: none;
-  font-weight: 700;
-  letter-spacing: .5px;
-  text-transform: uppercase;
-  white-space: nowrap;
-  position: relative;
-  /* 每个分栏的“轻分隔” */
-  border-right: 1px solid rgba(255,255,255,0.15);
-}
-
-/* 悬停：略变亮、投微阴影、无下划线 */
-.topbar .tab:hover{
-  background: linear-gradient(180deg,#3688d8 0%, #2a73bb 100%);
-  text-decoration: none;
-}
-
-/* 激活态：更深的蓝 + 内阴影，类似“按下的标签” */
-.topbar .tab.active{
-  background: linear-gradient(180deg,#1e5f99 0%, #184f81 100%);
-  box-shadow: inset 0 2px 6px rgba(0,0,0,.35);
-}
-
-/* 焦点可见性（键盘导航） */
-.topbar .tab:focus{
-  outline: 2px solid #9fd7ff;
-  outline-offset: -2px;
-}
-
-/* 小屏适配：缩小 padding，避免过高 */
-@media (max-width: 900px){
-  .topbar .tab{ padding: 10px 14px; }
 }
