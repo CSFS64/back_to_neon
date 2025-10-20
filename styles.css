@@ -1,7 +1,3 @@
-/* ===============================
-   ABC OSINT 导航 — 复古终端风 + 蓝色导航栏 + 段落间距优化
-   =============================== */
-
 /* 终端等宽字体栈 */
 :root {
   --mono-stack: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
@@ -28,13 +24,20 @@ html, body {
     repeating-linear-gradient(90deg, rgba(0,0,0,0.03) 0, rgba(0,0,0,0.03) 1px, transparent 1px, transparent 8px);
 }
 
-/* 链接（默认蓝字+下划线） */
-a { color: #0000EE; text-decoration: underline; text-underline-offset: 2px; }
-a { text-decoration-thickness: 2px; }          /* 下划线更粗，便于匹配 active 边框 */
-a:visited { color: #551A8B; }
-a:focus, a:hover { outline: 1px dotted #000; }
+/* 全站链接（统一粗下划线 & 虚线聚焦） */
+a {
+  color: #0000EE;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  text-decoration-thickness: 2px; /* 与 active 的粗描边视觉一致 */
+}
+a:focus,
+a:hover {
+  outline: 1px dotted #000;
+  outline-offset: 2px;
+}
 
-/* 行内链接：hover 变色，active 时粗蓝框且同色 */
+/* 行内链接（你要的交互：悬停=虚线外框；点击=同色粗外框） */
 a.inline-link {
   color: #005fa3;
   text-decoration: underline;
@@ -42,21 +45,21 @@ a.inline-link {
   text-decoration-thickness: 2px;
   padding: 1px 2px;
   border-radius: 2px;
-  transition: color .1s ease, outline .05s ease;
+  -webkit-tap-highlight-color: transparent;  /* iOS 长按高亮去除，避免叠色 */
+  transition: color .06s ease, outline .01s linear;
 }
-
-/* 悬停/聚焦：仅改变文字颜色，不填充背景、不显示细线 */
+/* 悬停/聚焦：虚线外框（与全站风格一致），不填充背景 */
 a.inline-link:hover,
 a.inline-link:focus {
   color: #007acc;
-  outline: none !important;
+  outline: 1px dotted #000;
+  outline-offset: 2px;
   background: none;
 }
-
-/* 点击时：立即出现粗边框，颜色与文字一致 */
+/* 点击/长按：同文字颜色的粗外框，立即出现 */
 a.inline-link:active,
 a.inline-link:focus-visible {
-  outline: 3px solid currentColor; /* 用 currentColor 让边框与文字颜色同步 */
+  outline: 3px solid currentColor !important; /* 用 currentColor 保证与文字同色 */
   outline-offset: 1px;
   background: none;
 }
@@ -107,12 +110,17 @@ nav.topbar a.tab {
   white-space: nowrap;
   border-right: 1px solid rgba(255,255,255,0.15);
 }
-nav.topbar a.tab:hover { background: linear-gradient(180deg,#3688d8 0%, #2a73bb 100%); }
+nav.topbar a.tab:hover {
+  background: linear-gradient(180deg,#3688d8 0%, #2a73bb 100%);
+}
 nav.topbar a.tab.active {
   background: linear-gradient(180deg,#1e5f99 0%, #184f81 100%);
   box-shadow: inset 0 2px 6px rgba(0,0,0,.35);
 }
-nav.topbar a.tab:focus { outline: 2px solid #9fd7ff; outline-offset: -2px; }
+nav.topbar a.tab:focus {
+  outline: 2px solid #9fd7ff;
+  outline-offset: -2px;
+}
 @media (max-width: 900px){
   nav.topbar a.tab { padding: 10px 14px; }
 }
@@ -149,14 +157,14 @@ nav.topbar a.tab:focus { outline: 2px solid #9fd7ff; outline-offset: -2px; }
   .sidebar-inner {
     position: sticky;
     top: 0;                                   /* 滚到顶端就粘住 */
-    /* 如果你想侧栏始终可见且不超出视口，可以限制最大高度并让内部滚动：
+    /* 如果想侧栏始终可见且不超出视口，可以限制最大高度并让内部滚动：
        max-height: calc(100vh - 0px);
        overflow: auto;
     */
   }
 }
 
-/* 移动：侧栏默认隐藏，点击开/关 */
+/* 移动：侧栏默认隐藏，点击开/关（配合 body.nav-open） */
 @media (max-width: 900px) {
   .sidebar { display: none !important; }
   body.nav-open .sidebar { display: block !important; }
@@ -182,7 +190,6 @@ nav.topbar a.tab:focus { outline: 2px solid #9fd7ff; outline-offset: -2px; }
 /* 高对比度模式 */
 body.contrast-high { background: #000; color: #0f0; }
 body.contrast-high a { color: #0ff; }
-body.contrast-high a:visited { color: #09f; }
 body.contrast-high .sidebar,
 body.contrast-high .nav-box,
 body.contrast-high .intro,
