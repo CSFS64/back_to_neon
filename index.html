@@ -3,47 +3,125 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>ABC OSINT — 导航与招募（终端风）</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>ABC OSINT — 导航与招募（复古终端风）</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body class="bg-tiles">
-  <main class="main">
-    <h1>ABC OSINT — 导航与招募</h1>
+  <a href="#main" class="skip-link">跳到正文</a>
 
-    <p>
-      我们是 ABC OSINT，一个开源战争分析小组。我们通过分析公开数据（卫星图、报道、志愿者资料等）重建和追踪前线态势。  
-      你可以在
-      <a class="inline-link" href="https://csfs64.github.io/test2/" target="_blank" rel="noopener">
-        互动地图
-      </a>
-      中查看每日前线变化；也可以在
-      <a class="inline-link" href="https://csfs64.github.io/hub/#" target="_blank" rel="noopener">
-        帖子流
-      </a>
-      里浏览简短更新与讨论。
-    </p>
+  <table class="layout" cellspacing="0" cellpadding="0" border="0">
+    <tr class="banner-row">
+      <td colspan="2" class="banner">
+        <div class="logo-area center">
+          <span class="crest">▦</span>
+          <span class="dept">ABC OSINT</span>
+          <span class="sub">Open-Source Intelligence Group</span>
+        </div>
 
-    <p>
-      我们长期招募开源分析志愿者，特别欢迎拥有自己项目、并能与我们数据体系结合的前后端开发者。  
-      有意者请将简历或反馈发送至：
-      <a class="inline-link" href="mailto:plus20dallors@gmail.com?subject=%5BFeedback%5D%20ABC%20OSINT">
-        plus20dallors@gmail.com
-      </a>
-      ，邮件主题请使用 [Feedback] 或 [Application] 开头。
-    </p>
+        <div class="mobile-menu center">
+          <a href="#menu" id="menuToggle" class="menu-link" aria-expanded="false" aria-controls="sidebar">☰ 打开导航（文字）</a>
+        </div>
 
-    <h2>招募方向</h2>
-    <ul>
-      <li>前端：基于 Leaflet / MapLibre 的可视化与时间轴。</li>
-      <li>后端：GeoJSON 数据接口与快照管理。</li>
-      <li>数据工程：标准化坐标、验证拓扑、生成历史版本。</li>
-    </ul>
+        <marquee behavior="scroll" direction="left" scrollamount="3" class="ticker">
+          ★ 欢迎访问 ABC OSINT 导航与招募页（复古终端风）★ 纯文字链接 + 高信息密度布局 ★
+        </marquee>
+        <marquee behavior="alternate" scrollamount="2" class="ticker alt">
+          ► Open Data • Open Methods • Open Collaboration ◄
+        </marquee>
 
-    <footer>
-      版权所有 © <span id="year"></span> ABC OSINT  
-      <br>Last updated: <span id="lastUpdated"></span>
-    </footer>
-  </main>
+        <div class="under-construction blink">
+          <span>🚧 UNDER CONSTRUCTION — 持续更新数据源与工具 🚧</span>
+        </div>
+      </td>
+    </tr>
+
+    <tr>
+      <!-- 侧栏 -->
+      <td class="sidebar" id="sidebar" valign="top">
+        <div class="nav-box">
+          <div class="nav-title">导航（Navigation）</div>
+          <ul class="nav-list">
+            <li><a href="#about" class="inline-link">关于我们（About）</a></li>
+            <li><a href="#projects" class="inline-link">项目与网站（Projects）</a></li>
+            <li><a href="#contrib" class="inline-link">如何参与（Contribute）</a></li>
+            <li><a href="#recruit" class="inline-link">加入我们（Recruiting）</a></li>
+            <li><a href="#contact" class="inline-link">联系（Contact）</a></li>
+            <li><a href="#faq" class="inline-link">常见问题（FAQ）</a></li>
+            <li><a href="#sitemap" class="inline-link">站点地图（Sitemap）</a></li>
+          </ul>
+        </div>
+
+        <div class="nav-box">
+          <div class="nav-title">快速入口（Quick Links）</div>
+          <p>
+            <a class="inline-link" href="https://csfs64.github.io/test2/" target="_blank" rel="noopener">
+              打开「前线时间机」查看不同日期的前线变化
+            </a><br>
+            <a class="inline-link" href="https://csfs64.github.io/hub/#" target="_blank" rel="noopener">
+              进入「Hub 帖子流」发布/查看简短更新
+            </a><br>
+            邮箱：<a class="inline-link" href="mailto:plus20dallors@gmail.com">plus20dallors@gmail.com</a>
+          </p>
+        </div>
+
+        <div class="box note">
+          <b>提示：</b>按 <u>?</u> 查看键盘帮助；按 <u>H</u> 切换高对比度模式；手机点顶部“☰”展开侧栏。
+        </div>
+      </td>
+
+      <!-- 内容 -->
+      <td class="content" valign="top">
+        <div id="main" class="main">
+          <h1 class="center">ABC OSINT — 导航与招募</h1>
+          <div class="hr-gif"></div>
+
+          <h2 id="about">关于我们（About）</h2>
+          <p class="intro">
+            ABC OSINT 是一个开源战争分析小组：我们使用公开来源的数据（卫星图、官方公报、媒体素材、志愿者记录等），
+            以可复核的流程复原与跟踪战场态势。
+            你可以在
+            <a class="inline-link" href="https://csfs64.github.io/test2/" target="_blank" rel="noopener">
+              互动地图
+            </a>
+            中查看前线变化，也可以在
+            <a class="inline-link" href="https://csfs64.github.io/hub/#" target="_blank" rel="noopener">
+              帖子流
+            </a>
+            中浏览分析更新。
+          </p>
+
+          <h2 id="recruit">加入我们（Recruiting）</h2>
+          <p>
+            我们长期招募开源分析志愿者，特别欢迎能将自己的
+            <a class="inline-link" href="#projects">前后端项目</a>
+            与我们的工具链结合的开发者。
+          </p>
+
+          <p>
+            若你有兴趣，请将简历或建议发送至
+            <a class="inline-link" href="mailto:plus20dallors@gmail.com">plus20dallors@gmail.com</a>，
+            并在邮件主题中使用 [Feedback] 或 [Application] 前缀。
+          </p>
+
+          <div class="hr-gif"></div>
+          <p class="center counter">Visitors: <tt id="hitCounter">[000001]</tt></p>
+          <p class="last-updated center">
+            Last updated: <span id="lastUpdated">—</span>
+          </p>
+        </div>
+      </td>
+    </tr>
+
+    <tr>
+      <td colspan="2" class="footer">
+        <p>
+          版权所有 © <span id="year">—</span> ABC OSINT. 本页面为复古终端风实验。
+        </p>
+      </td>
+    </tr>
+  </table>
+
   <script src="script.js"></script>
 </body>
 </html>
