@@ -1,15 +1,19 @@
-/* ===============================
-   复古加料：高信息密度 + 纯文字链接 + 老门户味
-   移动端仍可用；无外部资源。
-   =============================== */
+:root{
+  --mono-stack: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+                "Liberation Mono", "Lucida Console", "DejaVu Sans Mono",
+                "Courier New", monospace;
+}
 
-/* 老式字体栈 + 轻微行高 */
+/* 老式字体栈 → 终端等宽；轻微行高；关闭过度平滑以增强“硬朗”像素味 */
 html, body {
   margin: 0; padding: 0;
   background: #ffffff; color: #000;
-  font-family: "Times New Roman", Times, serif;
+  font-family: var(--mono-stack);
   line-height: 1.4;
   -webkit-text-size-adjust: 100%;
+  text-rendering: optimizeSpeed;
+  -webkit-font-smoothing: none;
+  -moz-osx-font-smoothing: auto;
 }
 
 /* 背景：细微瓷砖纹理（无图，CSS 生成） */
@@ -19,8 +23,8 @@ html, body {
     repeating-linear-gradient(90deg, rgba(0,0,0,0.03) 0, rgba(0,0,0,0.03) 1px, transparent 1px, transparent 8px);
 }
 
-/* 蓝色下划线链接 + 访问后紫色（经典） */
-a { color: #0000EE; text-decoration: underline; }
+/* 蓝色下划线链接 + 访问后紫色（经典），终端感的下划线间距 */
+a { color: #0000EE; text-decoration: underline; text-underline-offset: 2px; }
 a:visited { color: #551A8B; }
 a:focus, a:hover { outline: 1px dotted #000; }
 
@@ -37,9 +41,10 @@ table.layout { width: 100%; border-collapse: collapse; }
 
 .center { text-align: center; }
 
+/* 标题/Logo 等也用等宽体，略微加字距 */
 .logo-area { padding: 8px 12px 4px; font-size: 20px; }
-.logo-area .dept { font-weight: bold; }
-.logo-area .sub { margin-left: 8px; font-style: italic; font-size: 14px; color: #333; }
+.logo-area .dept { font-weight: 700; letter-spacing: .2px; }
+.logo-area .sub { margin-left: 8px; font-style: italic; font-size: 14px; color: #333; letter-spacing: .2px; }
 
 /* WeBring */
 .webring { padding: 4px 8px; font-size: 13px; }
@@ -54,16 +59,16 @@ table.layout { width: 100%; border-collapse: collapse; }
 
 /* Under Construction 横幅 + 伪 blink */
 .under-construction {
-  text-align: center; font-weight: bold;
+  text-align: center; font-weight: 700;
   padding: 6px 8px; border-bottom: 2px solid #000;
   background: #fff9d6;
 }
 .blink { animation: blink 1.2s steps(2, jump-none) infinite; }
 @keyframes blink { 50% { opacity: 0; } }
 
-/* 移动端菜单 */
+/* 顶部移动菜单（用链接做“按钮”，保留文字味） */
 .mobile-menu { padding: 4px 8px; }
-.menu-link { font-weight: bold; }
+.menu-link { font-weight: 700; }
 
 /* 侧栏（桌面） */
 .sidebar {
@@ -71,7 +76,7 @@ table.layout { width: 100%; border-collapse: collapse; }
   border-right: 1px solid #000; background: #fafafa; padding: 8px;
 }
 .nav-box { border: 1px solid #000; padding: 6px 8px; margin-bottom: 10px; background: #fff; }
-.nav-title { font-weight: bold; border-bottom: 1px solid #000; margin-bottom: 6px; }
+.nav-title { font-weight: 700; border-bottom: 1px solid #000; margin-bottom: 6px; letter-spacing: .2px; }
 .nav-list { list-style: square inside; margin: 0; padding: 0; }
 .nav-list li { margin: 4px 0; }
 
@@ -85,9 +90,9 @@ table.layout { width: 100%; border-collapse: collapse; }
 /* 内容区 */
 .content { padding: 12px 16px; }
 .main h1 {
-  margin: 8px 0 2px; font-size: 24px; border-bottom: 2px solid #000;
+  margin: 8px 0 2px; font-size: 24px; border-bottom: 2px solid #000; letter-spacing: .2px;
 }
-.main h2 { font-size: 18px; margin-top: 18px; }
+.main h2 { font-size: 18px; margin-top: 18px; letter-spacing: .2px; }
 .intro { background: #f9f9f9; border: 1px solid #000; padding: 8px 10px; }
 .dense-list { margin-top: 6px; }
 .dense-list li { margin: 2px 0; }
@@ -103,9 +108,9 @@ table.layout { width: 100%; border-collapse: collapse; }
 .sitemap { columns: 2; column-gap: 24px; }
 .sitemap li { break-inside: avoid; }
 
-/* 访问计数器风味 */
+/* 访问计数器：等宽体终端风 */
 .counter tt {
-  font-family: "Courier New", Courier, monospace;
+  font-family: var(--mono-stack);
   font-size: 16px; letter-spacing: 2px; background: #000; color: #0f0;
   padding: 2px 6px; border: 1px solid #0f0;
 }
@@ -119,7 +124,7 @@ table.layout { width: 100%; border-collapse: collapse; }
   background: #efefef; padding: 10px 6px 16px; font-size: 12px;
 }
 
-/* 高对比度（H 切换） */
+/* ===== 主题：高对比度（H 切换）与 CRT 终端（可选） ===== */
 body.contrast-high { background: #000; color: #0f0; }
 body.contrast-high a { color: #0ff; }
 body.contrast-high a:visited { color: #09f; }
@@ -129,6 +134,15 @@ body.contrast-high .intro,
 body.contrast-high .footer,
 body.contrast-high .banner { background: #000; color: #0f0; border-color: #0f0; }
 body.contrast-high .ticker { background: #010; border-color: #0f0; }
+
+/* 额外 CRT 主题：给 <body> 加 class="crt" 即可常驻绿屏终端味 */
+body.crt {
+  background: #001100;
+  color: #00ff66;
+  text-shadow: 0 0 1px #00ff66;
+}
+body.crt a { color: #66ffcc; }
+body.crt a:visited { color: #33ddaa; }
 
 /* 打印：保留正文、隐藏装饰 */
 @media print {
@@ -141,10 +155,11 @@ body.contrast-high .ticker { background: #010; border-color: #0f0; }
 @media (max-width: 900px) {
   html, body { font-size: 18px; line-height: 1.55; }
 
+  /* 让 table/tr/td 堆叠为块，保住复古布局的同时适配手机 */
   table.layout, table.layout tr, table.layout td { display: block; width: 100% !important; }
   .sidebar { border-right: none; border-top: 1px solid #000; }
 
-  /* 侧栏默认折叠，通过 body.nav-open 展开 */
+  /* 侧栏默认折叠，通过 body.nav-open 展开（script.js 控制） */
   .sidebar { display: none; }
   body.nav-open .sidebar { display: block; }
 
