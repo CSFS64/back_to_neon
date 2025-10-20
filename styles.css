@@ -34,31 +34,32 @@ a { text-decoration-thickness: 2px; }          /* 下划线更粗，便于匹配
 a:visited { color: #551A8B; }
 a:focus, a:hover { outline: 1px dotted #000; }
 
-/* ===== 行内链接交互（按你的新要求） =====
-   1) 悬停/聚焦：只变文字颜色（不填充底色）
-   2) 点击：出现更粗的蓝色外描边（厚度≈2px，与下划线一致）
-   3) 不要整段变黄（对应 JS 里已移除） */
+/* 行内链接：hover 变色，active 时粗蓝框且同色 */
 a.inline-link {
   color: #005fa3;
   text-decoration: underline;
   text-underline-offset: 2px;
   text-decoration-thickness: 2px;
-  padding: 1px 2px;            /* 给外描边留点空间 */
+  padding: 1px 2px;
   border-radius: 2px;
-  transition: color .1s ease, outline .1s ease;
+  transition: color .1s ease, outline .05s ease;
 }
+
+/* 悬停/聚焦：仅改变文字颜色，不填充背景、不显示细线 */
 a.inline-link:hover,
 a.inline-link:focus {
-  color: #007acc;              /* 仅变文字颜色 */
-  outline: none;               /* 不要虚线框 */
-  background: none;            /* 不填充底色 */
+  color: #007acc;
+  outline: none !important;
+  background: none;
 }
-a.inline-link:active {
-  outline: 2px solid #007acc;  /* 更粗的蓝色外描边 */
+
+/* 点击时：立即出现粗边框，颜色与文字一致 */
+a.inline-link:active,
+a.inline-link:focus-visible {
+  outline: 3px solid currentColor; /* 用 currentColor 让边框与文字颜色同步 */
   outline-offset: 1px;
   background: none;
 }
-a.inline-link:visited { color: #005fa3; }
 
 /* 段落/列表之间的换行间距：相邻 li 之间空一行 */
 .dense-list li + li {
