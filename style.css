@@ -1,0 +1,116 @@
+html, body {
+  margin: 0;
+  padding: 0;
+  background: #ffffff;
+  color: #000000;
+  font-family: "Times New Roman", Times, serif;
+  line-height: 1.35;
+}
+
+a {
+  color: #0000EE;
+  text-decoration: underline;
+}
+a:visited { color: #551A8B; }
+a:focus, a:hover { outline: 1px dotted #000; }
+
+table.layout { width: 100%; border-collapse: collapse; }
+
+.banner-row .banner {
+  background: #e5e5e5;
+  border-bottom: 2px solid #000;
+}
+
+.logo-area {
+  padding: 8px 12px 4px;
+  font-size: 18px;
+}
+.logo-area .dept { font-weight: bold; }
+.logo-area .sub {
+  margin-left: 8px;
+  font-style: italic;
+  font-size: 14px;
+  color: #333;
+}
+
+.ticker {
+  background: #f5f5f5;
+  border-top: 1px solid #000;
+  border-bottom: 1px solid #000;
+  padding: 4px 8px;
+  font-size: 13px;
+}
+
+.sidebar {
+  width: 260px;
+  border-right: 1px solid #000;
+  background: #fafafa;
+  padding: 8px;
+}
+
+.nav-box {
+  border: 1px solid #000;
+  padding: 6px 8px;
+  margin-bottom: 10px;
+  background: #fff;
+}
+.nav-title {
+  font-weight: bold;
+  border-bottom: 1px solid #000;
+  margin-bottom: 6px;
+}
+.nav-list { list-style: square inside; }
+
+.box.note {
+  border: 1px dashed #000;
+  padding: 6px 8px;
+  background: #fdf7d7;
+  font-size: 13px;
+}
+
+.content { padding: 12px 16px; }
+.main h1 {
+  margin-top: 8px;
+  font-size: 24px;
+  border-bottom: 2px solid #000;
+}
+.main h2 { font-size: 18px; margin-top: 18px; }
+.intro {
+  background: #f9f9f9;
+  border: 1px solid #000;
+  padding: 8px 10px;
+}
+.dense-list li { margin: 2px 0; }
+
+.footer {
+  text-align: center;
+  border-top: 2px solid #000;
+  background: #efefef;
+  padding: 10px 6px 16px;
+  font-size: 12px;
+}
+
+body.contrast-high {
+  background: #000;
+  color: #0f0;
+}
+body.contrast-high a { color: #0ff; }
+body.contrast-high .sidebar,
+body.contrast-high .nav-box,
+body.contrast-high .intro,
+body.contrast-high .footer,
+body.contrast-high .banner {
+  background: #000;
+  color: #0f0;
+  border-color: #0f0;
+}
+body.contrast-high .ticker {
+  background: #010;
+  border-color: #0f0;
+}
+
+@media print {
+  .sidebar, .ticker, .skip-link { display: none !important; }
+  .content { padding: 0; }
+  a { color: #000; text-decoration: none; }
+}
