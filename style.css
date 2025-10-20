@@ -158,3 +158,52 @@ body.contrast-high .ticker { background: #010; border-color: #0f0; }
   .main h2 { font-size: 18px; }
   .sitemap { columns: 1; }
 }
+
+/* ===== 顶部蓝色分栏导航 ===== */
+.topbar{
+  display: flex;
+  align-items: stretch;
+  gap: 0;                       /* 紧贴排列，像分栏 */
+  background: linear-gradient(180deg,#2b79c2 0%, #2267a8 100%); /* 蓝色底条 */
+  padding: 0;                   /* 与图一致的紧凑条 */
+  border-top: 1px solid #1e5e97;
+  border-bottom: 1px solid #0f3f68;
+  overflow-x: auto;             /* 小屏可横向滚动 */
+}
+
+.topbar .tab{
+  display: inline-block;
+  padding: 12px 18px;
+  color: #fff;
+  text-decoration: none;
+  font-weight: 700;
+  letter-spacing: .5px;
+  text-transform: uppercase;
+  white-space: nowrap;
+  position: relative;
+  /* 每个分栏的“轻分隔” */
+  border-right: 1px solid rgba(255,255,255,0.15);
+}
+
+/* 悬停：略变亮、投微阴影、无下划线 */
+.topbar .tab:hover{
+  background: linear-gradient(180deg,#3688d8 0%, #2a73bb 100%);
+  text-decoration: none;
+}
+
+/* 激活态：更深的蓝 + 内阴影，类似“按下的标签” */
+.topbar .tab.active{
+  background: linear-gradient(180deg,#1e5f99 0%, #184f81 100%);
+  box-shadow: inset 0 2px 6px rgba(0,0,0,.35);
+}
+
+/* 焦点可见性（键盘导航） */
+.topbar .tab:focus{
+  outline: 2px solid #9fd7ff;
+  outline-offset: -2px;
+}
+
+/* 小屏适配：缩小 padding，避免过高 */
+@media (max-width: 900px){
+  .topbar .tab{ padding: 10px 14px; }
+}
