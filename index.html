@@ -2,31 +2,54 @@
 <html lang="zh-CN">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1"> <!-- 移动端适配 -->
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <title>Department of Something — 官方信息门户（复古版实验）</title>
+  <title>Department of Something — 官方信息门户（复古·加强味版）</title>
   <link rel="stylesheet" href="styles.css">
 </head>
-<body>
+<body class="bg-tiles">
+  <!-- 跳转主内容（无障碍） -->
   <a href="#main" class="skip-link">跳到正文</a>
 
   <table class="layout" cellspacing="0" cellpadding="0" border="0">
     <tr class="banner-row">
       <td colspan="2" class="banner">
-        <div class="logo-area">
+        <div class="logo-area center">
           <span class="crest">▦</span>
           <span class="dept">Department of Something</span>
           <span class="sub">University Web Services</span>
         </div>
+
+        <!-- 顶部：WeBring（伪） -->
+        <div class="webring center">
+          <a href="#prev">⟸ Previous</a> | 
+          <a href="#next">Next ⟹</a> | 
+          <a href="#random">Random</a> — <span class="ring-name">Academic Info Ring</span>
+        </div>
+
+        <!-- 移动端文字菜单开关 -->
+        <div class="mobile-menu center">
+          <a href="#menu" id="menuToggle" class="menu-link" aria-expanded="false" aria-controls="sidebar">☰ 打开导航（文字）</a>
+        </div>
+
+        <!-- 跑马灯 ×2 提味 -->
         <marquee behavior="scroll" direction="left" scrollamount="3" class="ticker">
-          欢迎来到官方信息门户（实验性复古样式）。请使用左侧“文字链接”导航。
-          所有可点击内容均为 <u>蓝色下划线</u> 文本（已访问为紫色）。
+          ★ 欢迎访问本门户（实验性复古样式）★ 所有交互均为 <u>蓝色下划线</u> 文本链接 ★
         </marquee>
+        <marquee behavior="alternate" scrollamount="2" class="ticker alt">
+          ► 信息优先 • 兼容为王 • 少即是多 ◄
+        </marquee>
+
+        <!-- Under Construction 横幅（CSS 伪闪烁） -->
+        <div class="under-construction blink">
+          <span>🚧 UNDER CONSTRUCTION 🚧</span>
+        </div>
       </td>
     </tr>
 
     <tr>
-      <td class="sidebar" valign="top">
+      <!-- 左侧侧栏：文字链接风 + 框架味 -->
+      <td class="sidebar" id="sidebar" valign="top">
         <div class="nav-box">
           <div class="nav-title">导航（Navigation）</div>
           <ul class="nav-list">
@@ -36,6 +59,7 @@
             <li><a href="#policies">政策（Policies）</a></li>
             <li><a href="#contact">联系（Contact）</a></li>
             <li><a href="#faq">常见问题（FAQ）</a></li>
+            <li><a href="#sitemap">站点地图（Sitemap）</a></li>
           </ul>
         </div>
 
@@ -63,51 +87,57 @@
         <div class="box note">
           <b>提示：</b>按 <u>?</u> 查看键盘帮助；按 <u>H</u> 切换高对比度模式。
         </div>
+
+        <!-- 88x31 徽章（内嵌 SVG data URI） -->
+        <div class="badges center">
+          <img alt="Best viewed in Netscape" class="badge" src="data:image/svg+xml;utf8,<?xml version='1.0' encoding='UTF-8'?><svg xmlns='http://www.w3.org/2000/svg' width='88' height='31'><rect width='88' height='31' fill='black'/><text x='44' y='20' font-size='8' fill='white' text-anchor='middle' font-family='Verdana'>NETSCAPE NOW!</text></svg>">
+          <img alt="IE5 Optimized" class="badge" src="data:image/svg+xml;utf8,<?xml version='1.0' encoding='UTF-8'?><svg xmlns='http://www.w3.org/2000/svg' width='88' height='31'><rect width='88' height='31' fill='%2300008B'/><text x='44' y='20' font-size='8' fill='white' text-anchor='middle' font-family='Verdana'>IE5 OPTIMIZED</text></svg>">
+          <img alt="W3C-ish" class="badge" src="data:image/svg+xml;utf8,<?xml version='1.0' encoding='UTF-8'?><svg xmlns='http://www.w3.org/2000/svg' width='88' height='31'><rect width='88' height='31' fill='%23b00'/><text x='44' y='12' font-size='9' fill='white' text-anchor='middle' font-family='Verdana'>VALID</text><text x='44' y='23' font-size='8' fill='white' text-anchor='middle' font-family='Verdana'>SORT OF</text></svg>">
+        </div>
       </td>
 
+      <!-- 右侧正文 -->
       <td class="content" valign="top">
         <div id="main" class="main">
-          <h1>首页（Home）</h1>
+          <h1 class="center">首页（Home）</h1>
+          <div class="hr-gif"></div>
+
           <p class="intro">
-            本门户旨在以最<strong>朴素</strong>、<strong>高信息密度</strong>的方式提供教学相关信息。
-            我们遵循 2000 年代初的网页风格与可访问性原则：链接以
-            <a href="#style-guide">标准蓝色下划线</a> 展示；导航为 <a href="#text-links">纯文字链接</a>；
-            页面采用 <a href="#table-layout">表格布局</a> 以保证在旧浏览器中的兼容性。
+            本门户刻意保留 <a href="#text-links">蓝色下划线文字链接</a>、<a href="#table-layout">表格布局</a>、
+            <a href="#marquee">跑马灯</a>、<span class="blink">闪烁元素</span> 与徽章文化等符号，
+            以还原 1999–2003 年间高校/机构网站的“信息密度”与“工具性”美学。
+            移动端已做折叠导航与点击区域放大，不破坏整体年代感。
           </p>
 
           <h2 id="announcements">公告（Announcements）</h2>
           <ul class="dense-list">
-            <li>[10/20] 秋季学期课程更新，请参见 <a href="#catalog">Course Catalog</a> 与 <a href="#enroll">Enrollment</a>。</li>
-            <li>[10/18] 研究生说明会资料已上传，详见 <a href="#resources">教学资源</a>。</li>
-            <li>[10/12] 校园网络维护窗口，请参考 <a href="#it">IT Helpdesk</a> 公告。</li>
+            <li>[10/20] 秋季课程更新，详见 <a href="#catalog">Course Catalog</a> 与 <a href="#enroll">Enrollment</a>。</li>
+            <li>[10/18] 研究生说明会材料已上传，参见 <a href="#resources">教学资源</a>。</li>
+            <li>[10/12] 校园网络维护窗口，请查看 <a href="#it">IT Helpdesk</a> 公告。</li>
           </ul>
 
           <h2 id="deadlines">重要日期（Deadlines）</h2>
           <p>
-            Add/Drop 截止日期、学费缴纳、毕业申请等时程安排详见
-            <a href="#policies">Academic Policies</a>。如需申请延期，请在
-            <a href="#forms">Petition Forms</a> 中查找相应表格。
+            Add/Drop、学费缴纳、毕业申请等时程详见 <a href="#policies">Academic Policies</a>；
+            需要延期？请访问 <a href="#forms">Petition Forms</a>。
           </p>
 
           <h2 id="resources">教学资源（Resources）</h2>
           <p>
-            教师可在 <a href="#gradebook">Gradebook</a> 导出成绩；
-            助教可在 <a href="#office-hours">Office Hours</a> 更新办公时间；
-            学生可通过 <a href="#library">Library</a> 检索电子期刊；
-            如遇访问困难，请联系 <a href="#it">IT 支持</a>。
+            教师：<a href="#gradebook">Gradebook</a> 导出成绩；助教：<a href="#office-hours">Office Hours</a> 更新；
+            学生：通过 <a href="#library">Library</a> 检索电子期刊；遇到问题找 <a href="#it">IT 支持</a>。
           </p>
 
           <h2 id="policies">政策（Policies）</h2>
           <p>
-            学术诚信、迟交作业、成绩复核等政策列于
-            <a href="#handbook">Student Handbook</a>。访问受限文档请登录 <a href="#webmail">Webmail</a>。
+            学术诚信、迟交、成绩复核等政策见 <a href="#handbook">Student Handbook</a>。
+            权限受限文档请登录 <a href="#webmail">Webmail</a>。
           </p>
 
           <h2 id="faq">常见问题（FAQ）</h2>
           <p>
-            Q: 为什么页面这么“复古”？<br>
-            A: 因为本实验页面强调 <a href="#info-first">信息优先</a> 与
-            <a href="#compat">广泛兼容性</a>，并采用最低限度的图形装饰。
+            Q: 为什么页面像 2000 年？<br>
+            A: 因为我们服务于 <a href="#info-first">信息优先</a>、<a href="#compat">广泛兼容</a> 与 <a href="#archival">可归档</a>，并带点乡愁。
           </p>
 
           <h2 id="contact">联系（Contact）</h2>
@@ -117,16 +147,31 @@
             地址：123 Academic Way, Knowledge City, CA 90000
           </p>
 
-          <hr>
-          <p class="last-updated">
-            Last updated: <span id="lastUpdated">—</span>
+          <div class="hr-gif"></div>
+
+          <h2 id="sitemap">站点地图（Sitemap）</h2>
+          <ul class="sitemap">
+            <li><a href="#announcements">公告</a></li>
+            <li><a href="#deadlines">重要日期</a></li>
+            <li><a href="#resources">教学资源</a></li>
+            <li><a href="#policies">政策</a></li>
+            <li><a href="#faq">常见问题</a></li>
+            <li><a href="#contact">联系</a></li>
+          </ul>
+
+          <!-- Guestbook（邮件） -->
+          <p class="center">
+            <a href="mailto:guestbook@example.edu?subject=Guestbook%20Entry">签我的留言簿（Guestbook）</a>
           </p>
 
-          <noscript>
-            <div class="noscript">
-              注意：您已禁用脚本。为获得完整体验，请启用 JavaScript。
-            </div>
-          </noscript>
+          <!-- 访问计数器（脚本生成） -->
+          <p class="center counter">
+            Visitors: <tt id="hitCounter">[000001]</tt>
+          </p>
+
+          <p class="last-updated center">
+            Last updated: <span id="lastUpdated">—</span> • Best viewed at <b>1024×768</b>, <i>Netscape 4.7 / IE5</i>
+          </p>
         </div>
       </td>
     </tr>
@@ -135,7 +180,8 @@
       <td colspan="2" class="footer">
         <p>
           版权所有 © <span id="year">—</span> Department of Something.<br>
-          本页面为“复古风格实验”，仅供演示。<a href="#policies">使用条款</a> | <a href="#policies">隐私政策</a>
+          本页面为“复古风格实验·加强味”，仅供演示。
+          <a href="#policies">使用条款</a> | <a href="#policies">隐私政策</a>
         </p>
       </td>
     </tr>
