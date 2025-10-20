@@ -142,13 +142,16 @@ nav.topbar a.tab:focus { outline: 2px solid #9fd7ff; outline-offset: -2px; }
   padding: 8px;
 }
 
-/* 桌面：侧栏吸顶并可独立滚动 */
+/* 桌面：让包裹层 sticky，而不是 <td> 本身 */
 @media (min-width: 901px) {
-  .sidebar {
+  .sidebar { position: relative; }           /* 保险，给 sticky 一个定位上下文 */
+  .sidebar-inner {
     position: sticky;
-    top: 0;              /* 与顶部导航贴齐 */
-    height: 100vh;       /* 固定在视口高度 */
-    overflow: auto;      /* 侧栏内容可滚动 */
+    top: 0;                                   /* 滚到顶端就粘住 */
+    /* 如果你想侧栏始终可见且不超出视口，可以限制最大高度并让内部滚动：
+       max-height: calc(100vh - 0px);
+       overflow: auto;
+    */
   }
 }
 
