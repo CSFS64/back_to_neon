@@ -4,6 +4,19 @@
     "Liberation Mono", "Lucida Console", "DejaVu Sans Mono", "Courier New", monospace;
 }
 
+/* ===============================
+   通用荧光黄高亮样式
+   =============================== */
+.highlight-yellow {
+  position: relative;
+  display: inline-block;
+  padding: 2px 6px;
+  background: linear-gradient(180deg, #fff87a 0%, #ffe600 100%);
+  box-shadow: 0 0 6px rgba(255, 255, 0, 0.6);
+  border: 1px solid #e0b000;
+  color: #000;
+}
+
 html, body {
   margin: 0;
   padding: 0;
