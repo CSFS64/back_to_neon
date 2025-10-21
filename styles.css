@@ -390,28 +390,20 @@ body.contrast-high .ticker { background: #010; border-color: #0f0; }
   --gov-ink:  #111;
 }
 
-/* 顶部横幅：更官方的留白 + 细红线 */
-.theme-gov .banner {
-  background: linear-gradient(#fbfbfd, #f4f6fb);
-  border-bottom: 3px solid var(--gov-blue);
-  box-shadow: inset 0 -1px 0 #dfe4ee;
-  position: relative;
+/* 顶部导航：深蓝底，白字；分隔用小星号 */
+.theme-gov nav.topbar{
+  background: linear-gradient(180deg, var(--gov-blue) 0%, var(--gov-blue-2) 100%) !important;
+  border-top: 2px solid var(--gov-red);
+  border-bottom: 2px solid #0a1d3b;
 }
-
-/* 横幅底部增加一条“星条微带”，不刺眼 */
-.theme-gov .banner::after{
-  content:"";
-  position:absolute; left:0; right:0; bottom:-3px; height:6px;
-  background:
-    repeating-linear-gradient(
-      to right,
-      var(--gov-red) 0, var(--gov-red) 12px,
-      var(--gov-white) 12px, var(--gov-white) 24px
-    );
-  opacity:.18; /* 低不透明度，作为纹理存在 */
-  pointer-events:none;
+.theme-gov nav.topbar a.tab{
+  color:#fff !important;
+  font-weight:800;
+  letter-spacing:.6px;
+  text-transform:uppercase;
+  border-right:1px solid rgba(255,255,255,.15);
+  position:relative;
 }
-
 .theme-gov nav.topbar a.tab + a.tab::before{
   /* tab 之间插入细小“白星” */
   content:"★";
