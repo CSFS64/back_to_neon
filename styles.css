@@ -17,6 +17,32 @@
   color: #000;
 }
 
+/* ===============================
+   通用警示框样式
+   =============================== */
+.warning-box {
+  border: 2px solid #000;
+  background: #fff8c4;           /* 微微发黄的背景，比纯黄柔和 */
+  color: #000;
+  padding: 10px 12px;
+  margin: 18px 0 10px;
+  font-family: var(--mono-stack);
+  font-size: 14px;
+  line-height: 1.5;
+  box-shadow: 3px 3px 0 #000;    /* 模拟复古终端阴影边 */
+}
+.warning-box b {
+  color: #b00000;                /* 深红色标题文字 */
+}
+.warning-box a.inline-link {
+  color: #004ea2;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.warning-box a.inline-link:hover {
+  outline: 1px dotted #004ea2;
+}
+
 html, body {
   margin: 0;
   padding: 0;
