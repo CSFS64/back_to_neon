@@ -345,3 +345,46 @@ body.contrast-high .ticker { background: #010; border-color: #0f0; }
   .main h2 { font-size: 18px; }
   .sitemap { columns: 1; }
 }
+
+
+.consent-banner{
+  position: fixed;
+  left: 50%;
+  bottom: 12px;
+  transform: translateX(-50%);
+  z-index: 99999;
+  width: min(680px, calc(100% - 24px));
+  background: #fff;
+  color: #000;
+  border: 1px solid #000;
+  box-shadow: 3px 3px 0 #000;   /* 90s 阴影块 */
+  font-family: var(--mono-stack);
+  padding: 8px 10px;
+}
+.consent-title{
+  font-weight: 700;
+  margin-bottom: 6px;
+  border-bottom: 1px dashed #000;
+  padding-bottom: 4px;
+}
+.consent-text{
+  font-size: 14px;
+  line-height: 1.5;
+  margin-bottom: 8px;
+}
+.consent-actions{ display: flex; gap: 8px; }
+.btn{
+  border: 1px solid #000;
+  background: #f2f2f2;
+  padding: 4px 8px;
+  font-family: var(--mono-stack);
+  cursor: pointer;
+}
+.btn:focus, .btn:hover{ outline: 1px dotted #000; outline-offset: 2px; }
+.btn-yes{ background: #e8ffe8; }
+.btn-no { background: #fff5f5; }
+
+body.contrast-high .consent-banner{
+  background:#000; color:#0f0; border-color:#0f0; box-shadow:3px 3px 0 #0f0;
+}
+body.contrast-high .btn{ background:#010; color:#0f0; border-color:#0f0; }
