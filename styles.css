@@ -49,6 +49,79 @@
   font-weight: 700;
 }
 
+/* ============ 信息盒通用样式 ============ */
+.section-box{
+  border: 1px solid #000;
+  background: #fff;
+  margin: 14px 0 16px;
+}
+
+.section-head{
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  padding: 6px 8px;
+  border-bottom: 1px solid #000;
+  background:
+    repeating-linear-gradient(90deg, #e8f2ff 0, #e8f2ff 2px, transparent 2px, transparent 6px),
+    #f4f8ff;
+}
+
+.section-tag{
+  font-size: 12px;
+  padding: 1px 4px;
+  border: 1px solid #000;
+  background: #fff;
+  letter-spacing: .5px;
+}
+
+.section-title{
+  display: inline-block;
+  margin: 0;
+  font-size: 18px;
+  letter-spacing: .2px;
+}
+
+.section-body{
+  padding: 10px 12px;
+}
+
+.subbox{
+  border: 1px solid #000;
+  background: #fff;
+  margin: 8px 0 12px;
+}
+.subbox-head{
+  padding: 5px 8px;
+  border-bottom: 1px solid #000;
+  background: #f2f2f2;
+  font-weight: 700;
+}
+.subbox > pre{
+  margin: 0;
+  padding: 10px 12px;
+  background: #fff;
+  border-top: none;
+  font-family: var(--mono-stack);
+  white-space: pre-wrap;
+}
+
+.qa{ margin: 6px 0 10px; }
+.q{ font-weight: 700; }
+.a{ margin-top: 2px; }
+
+.grid-2{
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+@media (min-width: 900px){
+  .grid-2{ grid-template-columns: 1fr 1fr; }
+}
+.grid-col{ min-width: 0; }
+.section-body .dense-list li + li{ margin-top: .4em; }
+.section-title + *{ margin-top: 0; }
+
 html, body {
   margin: 0;
   padding: 0;
