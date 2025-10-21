@@ -1,4 +1,49 @@
 (function () {
+  var CONSENT_KEY = 'kalyna_consent_v1';
+  var HIT_KEY = 'kalyna_hits_v1';
+  var banner = document.getElementById('consentBanner');
+  if (!banner) return;
+
+  var choice = null;
+  try { choice = localStorage.getItem(CONSENT_KEY); } catch (e) {}
+
+  // —— 工具函数：只在允许时更新访问计数
+  function updateHitCounterIfAllowed() {
+    if (choice !== 'allow') return;
+    try {
+      var count = parseInt(localStorage.getItem(HIT_KEY) || '0', 10) + 1;
+      localStorage.setItem(HIT_KEY, String(count));
+      var el = document.getElementById('hitCounter');
+      if (el) el.textContent = '[' + String(count).padStart(6, '0') + ']';
+    } catch (e) {}
+  }
+
+  // 初次访问：显示同意条
+  if (!choice) {
+    banner.hidden = false; // 关键：把 hidden 去掉
+  } else {
+    // 已经有选择：立刻根据选择更新计数
+    updateHitCounterIfAllowed();
+  }
+
+  // 绑定按钮
+  var allowBtn = document.getElementById('consentAllow');
+  var denyBtn  = document.getElementById('consentDeny');
+
+  if (allowBtn) allowBtn.addEventListener('click', function () {
+    try { localStorage.setItem(CONSENT_KEY, 'allow'); } catch (e) {}
+    choice = 'allow';
+    updateHitCounterIfAllowed();
+    banner.remove();
+  });
+
+  if (denyBtn) denyBtn.addEventListener('click', function () {
+    try { localStorage.setItem(CONSENT_KEY, 'deny'); } catch (e) {}
+    banner.remove();
+  });
+})();
+
+(function () {
   // 年份与更新时间
   var now = new Date();
   var y = document.getElementById('year');
@@ -15,58 +60,3 @@
       menuToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
     });
   }
-
-  // 假访问计数器（localStorage）
-  (function consentAndCounter(){
-  var CONSENT_KEY = 'kalyna_consent_v1'; // 'all' 或 'necessary'
-  var COUNT_KEY   = 'kalyna_hits_v1';
-
-  function hasConsentAll(){
-    try { return localStorage.getItem(CONSENT_KEY) === 'all'; } catch(e){ return false; }
-  }
-  function setConsent(val){
-    try { localStorage.setItem(CONSENT_KEY, val); } catch(e){}
-  }
-
-  function runOptionalFeatures(){
-    // 本地访问计数器（仅在允许“可选功能”后运行）
-    try {
-      var c = parseInt(localStorage.getItem(COUNT_KEY) || '0', 10) + 1;
-      localStorage.setItem(COUNT_KEY, String(c));
-      var txt = '[' + String(c).padStart(6, '0') + ']';
-      var el = document.getElementById('hitCounter');
-      if (el) el.textContent = txt;
-    } catch(e){}
-  }
-
-  function showBanner(){
-    var b = document.getElementById('consentBanner');
-    if(!b) return;
-    b.hidden = false;
-    var allow = document.getElementById('consentAllow');
-    var deny  = document.getElementById('consentDeny');
-    if(allow) allow.addEventListener('click', function(){
-      setConsent('all');
-      runOptionalFeatures();
-      b.remove();
-    });
-    if(deny) deny.addEventListener('click', function(){
-      setConsent('necessary');
-      b.remove();
-    });
-  }
-
-  // 首次访问：无选择则弹出；已有选择则按选择执行
-  try {
-    var choice = localStorage.getItem(CONSENT_KEY);
-    if (choice === 'all'){
-      runOptionalFeatures();
-    } else if (choice === 'necessary'){
-      /* 不运行可选功能 */
-    } else {
-      showBanner();
-    }
-  } catch(e){
-    // localStorage 不可用时，既不弹窗也不计数，静默退化
-  }
-})();
