@@ -51,76 +51,112 @@
 
 /* ============ 信息盒通用样式 ============ */
 .section-box{
-  border: 1px solid #000;
-  background: #fff;
-  margin: 14px 0 16px;
+  border:1px solid #000;
+  background:#fff;
+  margin:14px 0 16px;
+  padding:0;                 /* 去内边距，结构更“直” */
+  box-shadow:none;           /* 不要阴影 */
+  border-radius:0;           /* 去圆角 */
+  font-family: var(--mono-stack); /* 统一等宽味 */
 }
 
+/* 头部：黑白反相条 + ASCII 括号感 */
 .section-head{
-  display: flex;
-  align-items: baseline;
-  gap: 8px;
-  padding: 6px 8px;
-  border-bottom: 1px solid #000;
-  background:
-    repeating-linear-gradient(90deg, #e8f2ff 0, #e8f2ff 2px, transparent 2px, transparent 6px),
-    #f4f8ff;
+  display:block;
+  background:#000;
+  color:#fff;
+  border-bottom:1px solid #000;
+  padding:6px 8px 5px;
 }
 
+/* 小标签弱化：用中括号小字 */
 .section-tag{
-  font-size: 12px;
-  padding: 1px 4px;
-  border: 1px solid #000;
-  background: #fff;
-  letter-spacing: .5px;
+  font-size:12px;
+  letter-spacing:.3px;
+  margin-right:6px;
+  opacity:.85;
 }
+.section-tag::before{ content:"["; }
+.section-tag::after{ content:"]"; }
 
+/* 标题：全大写/等宽/不加粗也能“硬” */
 .section-title{
-  display: inline-block;
-  margin: 0;
-  font-size: 18px;
-  letter-spacing: .2px;
+  display:inline;
+  margin:0;
+  padding:0;
+  font-size:16px;
+  font-weight:700;
+  text-transform:uppercase;
+  letter-spacing:.6px;
 }
 
+/* 内容体：细内边距 + 虚线分隔线 */
 .section-body{
-  padding: 10px 12px;
+  padding:8px 10px;
+  border-top:1px dashed #000;   /* 90s 风味线 */
 }
 
+/* 子盒（subbox）：像“系统窗口” */
 .subbox{
-  border: 1px solid #000;
-  background: #fff;
-  margin: 8px 0 12px;
+  border:1px solid #000;
+  background:#fff;
+  margin:10px 0;
+  padding:0;
 }
 .subbox-head{
-  padding: 5px 8px;
-  border-bottom: 1px solid #000;
-  background: #f2f2f2;
-  font-weight: 700;
+  background:#f2f2f2;
+  border-bottom:1px dotted #000;
+  padding:5px 8px;
+  font-weight:700;
 }
-.subbox > pre{
-  margin: 0;
-  padding: 10px 12px;
-  background: #fff;
-  border-top: none;
-  font-family: var(--mono-stack);
-  white-space: pre-wrap;
-}
+.subbox > .dense-list,
+.subbox > p,
+.subbox > pre{ padding:8px 10px; margin:0; }
 
-.qa{ margin: 6px 0 10px; }
-.q{ font-weight: 700; }
-.a{ margin-top: 2px; }
-
+/* 两列栅格：纯 CSS，像表格一样“硬分栏” */
 .grid-2{
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 12px;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;            /* 细小间隙，别太现代 */
 }
-@media (min-width: 900px){
-  .grid-2{ grid-template-columns: 1fr 1fr; }
+.grid-col{ min-width:0; }
+
+/* QA 块：前缀 Q:/A:，虚线分隔 */
+.qa{ padding:6px 0; border-bottom:1px dashed #000; }
+.qa:last-child{ border-bottom:0; }
+.q::before{ content:"Q: "; font-weight:700; }
+.a::before{ content:"A: "; font-weight:700; }
+
+/* 黄色高亮标题（收敛版） */
+.highlight-yellow{
+  background: linear-gradient(to bottom, #fff79a 0, #fff79a 60%, transparent 60%);
+  border-bottom:1px solid #000;
+  display:inline-block;
+  padding:1px 3px 0;
 }
-.grid-col{ min-width: 0; }
-.section-body .dense-list li + li{ margin-top: .4em; }
-.section-title + *{ margin-top: 0; }
+
+/* 警告框：红标题 + 虚线边 */
+.warning-box{
+  border:1px dashed #000;
+  background:#fff;
+  padding:8px 10px;
+  margin:12px 0;
+}
+.warning-box b{ color:#b00000; }
+
+/* 列表间距：一行的“复古空白” */
+.dense-list li + li{ margin-top:0.9em; }
+
+/* 链接的交互（保持你之前的规则，但更终端味） */
+a{ color:#0000EE; text-decoration:underline; text-underline-offset:2px; text-decoration-thickness:2px; }
+a:visited{ color:#0000EE; }              /* 取消访问后变色 */
+a:hover, a:focus{ outline:1px dotted #000; outline-offset:2px; }
+a.inline-link:hover, a.inline-link:focus{ color:#004fd6; }
+
+/* 移动端：栅格降级为单列，更像早期网页堆叠 */
+@media (max-width: 900px){
+  .grid-2{ grid-template-columns:1fr; gap:8px; }
+}
 
 html, body {
   margin: 0;
