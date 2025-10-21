@@ -1,4 +1,4 @@
-(function () {
+; (function () {
   var CONSENT_KEY = 'kalyna_consent_v1';
   var HIT_KEY = 'kalyna_hits_v1';
   var banner = document.getElementById('consentBanner');
@@ -7,7 +7,7 @@
   var choice = null;
   try { choice = localStorage.getItem(CONSENT_KEY); } catch (e) {}
 
-  // —— 工具函数：只在允许时更新访问计数
+  // —— 只在允许时更新访问计数
   function updateHitCounterIfAllowed() {
     if (choice !== 'allow') return;
     try {
@@ -18,11 +18,10 @@
     } catch (e) {}
   }
 
-  // 初次访问：显示同意条
+  // 初次访问：显示同意条；否则根据选择更新计数
   if (!choice) {
-    banner.hidden = false; // 关键：把 hidden 去掉
+    banner.hidden = false;
   } else {
-    // 已经有选择：立刻根据选择更新计数
     updateHitCounterIfAllowed();
   }
 
@@ -43,7 +42,7 @@
   });
 })();
 
-(function () {
+; (function () {
   // 年份与更新时间
   var now = new Date();
   var y = document.getElementById('year');
@@ -60,3 +59,4 @@
       menuToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
     });
   }
+})();
