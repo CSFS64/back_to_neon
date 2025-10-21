@@ -376,3 +376,119 @@ body.contrast-high .ticker { background: #010; border-color: #0f0; }
 .consent-actions .btn:hover{ outline: 1px dotted #000; outline-offset: 2px; }
 .consent-actions .btn-yes{ background:#d9ffd9; }
 .consent-actions .btn-no{ background:#ffe5e5; }
+
+
+/* ===============================
+   叠加主题
+   =============================== */
+.theme-gov nav.topbar {
+  background-image:
+    repeating-linear-gradient(
+      -45deg,
+      rgba(180, 0, 0, 0.06) 0,
+      rgba(180, 0, 0, 0.06) 1.5px,
+      rgba(255, 255, 255, 0.06) 1.5px,
+      rgba(255, 255, 255, 0.06) 3px
+    ),
+    linear-gradient(180deg, #2b79c2 0%, #2267a8 100%) !important;
+  background-blend-mode: multiply, normal;
+}
+
+.theme-gov nav.topbar::after {
+  content: "";
+  display: block;
+  height: 3px;
+  background:
+    linear-gradient(
+      to right,
+      rgba(178,34,34,.55) 0 25%,
+      rgba(255,255,255,.55) 25% 50%,
+      rgba(30,144,255,.55) 50% 75%,
+      rgba(255,255,255,.55) 75% 100%
+    );
+}
+
+.theme-gov .logo-area {
+  position: relative;
+  overflow: hidden;
+}
+.theme-gov .logo-area::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: .07;
+  background-image: url("data:image/svg+xml;utf8,\
+  <svg xmlns='http://www.w3.org/2000/svg' width='16' height='16'>\
+    <rect width='16' height='16' fill='none'/>\
+    <path d='M8 2.5l1 2.2 2.4.2-1.9 1.5.6 2.3L8 7.3 5.9 8.7l.6-2.3-1.9-1.5 2.4-.2 1-2.2z' fill='%23ffffff'/>\
+  </svg>");
+  background-repeat: repeat;
+  background-size: 16px 16px;
+  mix-blend-mode: screen;
+}
+
+.theme-gov .ticker {
+  border-top: 1px solid rgba(178,34,34,.6);
+  border-bottom: 1px solid rgba(30,144,255,.6);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.35);
+}
+
+.theme-gov .section-head {
+  position: relative;
+}
+.theme-gov .section-head::after {
+  content: "";
+  position: absolute;
+  top: 50%; right: 8px; transform: translateY(-50%);
+  width: 120px; height: 24px;
+  pointer-events: none;
+  background-image: radial-gradient(rgba(255,255,255,.15) 1px, transparent 1px);
+  background-size: 6px 6px;
+  opacity: .4;
+  mask-image: linear-gradient(to left, black, transparent);
+}
+
+.theme-gov .footer {
+  position: relative;
+  overflow: hidden;
+}
+.theme-gov .footer::before {
+  content: "";
+  position: absolute;
+  left: 10px; bottom: 8px;
+  width: 64px; height: 64px;
+  pointer-events: none;
+  opacity: .12;
+  background-image: url("data:image/svg+xml;utf8,\
+  <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'>\
+    <circle cx='50' cy='50' r='46' fill='none' stroke='%23000' stroke-width='2'/>\
+    <g fill='%23000'>\
+      <polygon points='50,18 53,25 60,26 55,31 56,38 50,35 44,38 45,31 40,26 47,25'/>\
+      <polygon points='50,82 53,75 60,74 55,69 56,62 50,65 44,62 45,69 40,74 47,75'/>\
+      <polygon points='18,50 25,47 26,40 31,45 38,44 35,50 38,56 31,55 26,60 25,53'/>\
+      <polygon points='82,50 75,53 74,60 69,55 62,56 65,50 62,44 69,45 74,40 75,47'/>\
+    </g>\
+  </svg>");
+  background-size: contain;
+  background-repeat: no-repeat;
+}
+
+.theme-gov .nav-title {
+  background:
+    repeating-linear-gradient(
+      90deg,
+      rgba(178,34,34,.08) 0, rgba(178,34,34,.08) 2px,
+      transparent 2px, transparent 6px
+    );
+}
+
+body.contrast-high.theme-gov nav.topbar,
+body.contrast-high.theme-gov .logo-area::after,
+body.contrast-high.theme-gov .section-head::after,
+body.contrast-high.theme-gov .footer::before,
+body.contrast-high.theme-gov .nav-title {
+  background: none !important;
+  box-shadow: none !important;
+}
+body.contrast-high.theme-gov .ticker { border-color: #0f0 !important; }
