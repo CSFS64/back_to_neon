@@ -43,6 +43,12 @@
   outline: 1px dotted #004ea2;
 }
 
+/* ===== 红色文字通用样式 ===== */
+.red-text {
+  color: #b00000;
+  font-weight: 700;
+}
+
 html, body {
   margin: 0;
   padding: 0;
