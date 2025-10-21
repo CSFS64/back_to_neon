@@ -381,114 +381,200 @@ body.contrast-high .ticker { background: #010; border-color: #0f0; }
 /* ===============================
    叠加主题
    =============================== */
-.theme-gov nav.topbar {
-  background-image:
-    repeating-linear-gradient(
-      -45deg,
-      rgba(180, 0, 0, 0.06) 0,
-      rgba(180, 0, 0, 0.06) 1.5px,
-      rgba(255, 255, 255, 0.06) 1.5px,
-      rgba(255, 255, 255, 0.06) 3px
-    ),
-    linear-gradient(180deg, #2b79c2 0%, #2267a8 100%) !important;
-  background-blend-mode: multiply, normal;
+.theme-gov {
+  --gov-blue: #1b3a6b;
+  --gov-blue-2: #0f2b52;
+  --gov-red:  #b22234;
+  --gov-gold: #caa23a;
+  --gov-white:#ffffff;
+  --gov-ink:  #111;
 }
 
-.theme-gov nav.topbar::after {
-  content: "";
-  display: block;
-  height: 3px;
+/* 顶部横幅：更官方的留白 + 细红线 */
+.theme-gov .banner {
+  background: linear-gradient(#fbfbfd, #f4f6fb);
+  border-bottom: 3px solid var(--gov-blue);
+  box-shadow: inset 0 -1px 0 #dfe4ee;
+  position: relative;
+}
+
+/* 横幅底部增加一条“星条微带”，不刺眼 */
+.theme-gov .banner::after{
+  content:"";
+  position:absolute; left:0; right:0; bottom:-3px; height:6px;
   background:
-    linear-gradient(
+    repeating-linear-gradient(
       to right,
-      rgba(178,34,34,.55) 0 25%,
-      rgba(255,255,255,.55) 25% 50%,
-      rgba(30,144,255,.55) 50% 75%,
-      rgba(255,255,255,.55) 75% 100%
+      var(--gov-red) 0, var(--gov-red) 12px,
+      var(--gov-white) 12px, var(--gov-white) 24px
     );
+  opacity:.18; /* 低不透明度，作为纹理存在 */
+  pointer-events:none;
 }
 
-.theme-gov .logo-area {
-  position: relative;
-  overflow: hidden;
+/* 顶部导航：深蓝底，白字；分隔用小星号 */
+.theme-gov nav.topbar{
+  background: linear-gradient(180deg, var(--gov-blue) 0%, var(--gov-blue-2) 100%) !important;
+  border-top: 2px solid var(--gov-red);
+  border-bottom: 2px solid #0a1d3b;
 }
-.theme-gov .logo-area::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  opacity: .07;
-  background-image: url("data:image/svg+xml;utf8,\
-  <svg xmlns='http://www.w3.org/2000/svg' width='16' height='16'>\
-    <rect width='16' height='16' fill='none'/>\
-    <path d='M8 2.5l1 2.2 2.4.2-1.9 1.5.6 2.3L8 7.3 5.9 8.7l.6-2.3-1.9-1.5 2.4-.2 1-2.2z' fill='%23ffffff'/>\
-  </svg>");
-  background-repeat: repeat;
-  background-size: 16px 16px;
-  mix-blend-mode: screen;
+.theme-gov nav.topbar a.tab{
+  color:#fff !important;
+  font-weight:800;
+  letter-spacing:.6px;
+  text-transform:uppercase;
+  border-right:1px solid rgba(255,255,255,.15);
+  position:relative;
 }
-
-.theme-gov .ticker {
-  border-top: 1px solid rgba(178,34,34,.6);
-  border-bottom: 1px solid rgba(30,144,255,.6);
-  box-shadow: inset 0 1px 0 rgba(255,255,255,.35);
+.theme-gov nav.topbar a.tab + a.tab::before{
+  /* tab 之间插入细小“白星” */
+  content:"★";
+  position:absolute; left:-10px; top:50%; transform:translateY(-50%);
+  font-size:10px; color:rgba(255,255,255,.65);
 }
-
-.theme-gov .section-head {
-  position: relative;
+.theme-gov nav.topbar a.tab:hover{
+  background: linear-gradient(180deg,#2a4f86 0%,#223f6b 100%);
 }
-.theme-gov .section-head::after {
-  content: "";
-  position: absolute;
-  top: 50%; right: 8px; transform: translateY(-50%);
-  width: 120px; height: 24px;
-  pointer-events: none;
-  background-image: radial-gradient(rgba(255,255,255,.15) 1px, transparent 1px);
-  background-size: 6px 6px;
-  opacity: .4;
-  mask-image: linear-gradient(to left, black, transparent);
+.theme-gov nav.topbar a.tab:focus{
+  outline:2px dotted #fff; outline-offset:-2px;
 }
 
-.theme-gov .footer {
-  position: relative;
-  overflow: hidden;
+/* LOGO 区域：加细线与“机构”感 */
+.theme-gov .logo-area{
+  color:var(--gov-ink);
 }
-.theme-gov .footer::before {
-  content: "";
-  position: absolute;
-  left: 10px; bottom: 8px;
-  width: 64px; height: 64px;
-  pointer-events: none;
-  opacity: .12;
-  background-image: url("data:image/svg+xml;utf8,\
-  <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'>\
-    <circle cx='50' cy='50' r='46' fill='none' stroke='%23000' stroke-width='2'/>\
-    <g fill='%23000'>\
-      <polygon points='50,18 53,25 60,26 55,31 56,38 50,35 44,38 45,31 40,26 47,25'/>\
-      <polygon points='50,82 53,75 60,74 55,69 56,62 50,65 44,62 45,69 40,74 47,75'/>\
-      <polygon points='18,50 25,47 26,40 31,45 38,44 35,50 38,56 31,55 26,60 25,53'/>\
-      <polygon points='82,50 75,53 74,60 69,55 62,56 65,50 62,44 69,45 74,40 75,47'/>\
-    </g>\
-  </svg>");
-  background-size: contain;
-  background-repeat: no-repeat;
+.theme-gov .logo-area .dept{
+  font-weight:900;
+  letter-spacing:.8px;
+  border-left:4px solid var(--gov-blue);
+  padding-left:10px;
+}
+.theme-gov .logo-area .sub{
+  color:#445; letter-spacing:.4px;
 }
 
-.theme-gov .nav-title {
+/* 黄色高亮标题：底线改为红蓝双线，更像官方批注条 */
+.theme-gov .highlight-yellow{
+  box-shadow:none;
+  border:1px solid #000;
+  background: linear-gradient(to bottom, #fff79a 0, #fff79a 60%, transparent 60%);
+  position:relative;
+}
+.theme-gov .highlight-yellow::after{
+  content:"";
+  position:absolute; left:0; right:0; bottom:-3px; height:3px;
   background:
-    repeating-linear-gradient(
-      90deg,
-      rgba(178,34,34,.08) 0, rgba(178,34,34,.08) 2px,
-      transparent 2px, transparent 6px
-    );
+    linear-gradient(to right, var(--gov-blue) 0 50%, var(--gov-red) 50% 100%);
 }
 
-body.contrast-high.theme-gov nav.topbar,
-body.contrast-high.theme-gov .logo-area::after,
-body.contrast-high.theme-gov .section-head::after,
-body.contrast-high.theme-gov .footer::before,
-body.contrast-high.theme-gov .nav-title {
-  background: none !important;
-  box-shadow: none !important;
+/* 信息盒（section-box）：深蓝标题条 + 红色细下边 */
+.theme-gov .section-box{
+  border:1px solid #000; border-radius:0; box-shadow:none;
 }
-body.contrast-high.theme-gov .ticker { border-color: #0f0 !important; }
+.theme-gov .section-head{
+  background: var(--gov-blue);
+  color:#fff; border-bottom:2px solid var(--gov-red);
+  padding:6px 10px;
+}
+.theme-gov .section-tag{
+  border:1px solid rgba(255,255,255,.7);
+  background: rgba(255,255,255,.08);
+  color:#fff; opacity:1; letter-spacing:.5px;
+}
+.theme-gov .section-title{
+  color:#fff; letter-spacing:.8px; font-weight:800;
+}
+
+/* 子盒标题条：淡蓝底 + 点状分隔 */
+.theme-gov .subbox-head{
+  background:#e9eff8;
+  border-bottom:1px dotted #6d86ab;
+}
+
+/* 警告框：左侧红条 + 顶部细蓝线 */
+.theme-gov .warning-box{
+  border:1px solid #000;
+  background:#fff;
+  box-shadow:none;
+  position:relative;
+  padding-left:12px;
+}
+.theme-gov .warning-box::before{
+  content:"";
+  position:absolute; left:0; top:0; bottom:0; width:4px;
+  background: var(--gov-red);
+}
+.theme-gov .warning-box::after{
+  content:"";
+  position:absolute; left:0; right:0; top:-3px; height:3px;
+  background: var(--gov-blue);
+}
+.theme-gov .warning-box b{ color:#8b0000; }
+
+/* 快速入口：红点星标（仅标题词） */
+.theme-gov .red-text{
+  color:#8b0000; position:relative; padding-left:14px;
+}
+.theme-gov .red-text::before{
+  content:"★";
+  position:absolute; left:0; top:0; transform:translateY(2px) scale(.9);
+  font-size:10px; color:#c33;
+}
+
+/* 列表星标（仅资源/招募/FAQ等内容区，提高识别但不过度） */
+.theme-gov .section-body .dense-list li{
+  list-style:none; position:relative; padding-left:16px;
+}
+.theme-gov .section-body .dense-list li::before{
+  content:"★";
+  position:absolute; left:0; top:.15em;
+  font-size:10px; color:#7c8fb3; opacity:.8;
+}
+
+/* 侧栏：边框加深 + 标题加上微小红蓝角标 */
+.theme-gov .nav-box{ border-color:#222; }
+.theme-gov .nav-title{
+  position:relative; padding-left:10px;
+}
+.theme-gov .nav-title::before{
+  content:""; position:absolute; left:0; top:50%; transform:translateY(-50%);
+  width:6px; height:6px; background:var(--gov-blue);
+  box-shadow:6px 0 0 var(--gov-red);
+}
+
+/* 页脚：蓝红双线 + 字体更“机构” */
+.theme-gov .footer{
+  border-top:4px solid var(--gov-blue);
+  box-shadow: inset 0 4px 0 var(--gov-red);
+  background:#f3f6fb;
+  color:#223;
+}
+
+/* 互动元素：按钮和链接的聚焦边更明显（AA/AAA 易见焦点） */
+.theme-gov .consent-actions .btn-yes{ background:#e8f6ff; }
+.theme-gov .consent-actions .btn-no{ background:#fff0f0; }
+.theme-gov a:focus, .theme-gov a:hover{
+  outline:2px dotted var(--gov-blue);
+  outline-offset:2px;
+}
+.theme-gov a.inline-link:active, .theme-gov a.inline-link:focus-visible{
+  outline:3px solid currentColor !important;
+  outline-offset:1px;
+}
+
+/* 细节：跑马灯条边更“公告栏” */
+.theme-gov .ticker{ border-color:#000; background:#f9fbff; }
+.theme-gov .ticker.alt{ background:#f2f6ff; }
+
+/* 可选：在正文顶部放个“PUBLIC RESOURCE”轻量徽标（纯 CSS，不需改 HTML） */
+.theme-gov .content{
+  position:relative;
+}
+.theme-gov .content::before{
+  content:"PUBLIC RESOURCE";
+  position:absolute; right:0; top:-22px;
+  font-size:10px; letter-spacing:1px; font-weight:800;
+  color:#fff; background:var(--gov-blue);
+  padding:2px 6px;
+  border-left:3px solid var(--gov-red);
+}
