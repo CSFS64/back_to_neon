@@ -562,28 +562,35 @@ body.contrast-high .ticker { background: #010; border-color: #0f0; }
 
 
 /* ===============================
-   🇺🇸 Subtle Flag Texture 2.0
+   🇺🇸 Subtle Flag Texture 3.0 — 强化版可见星条纹理
    =============================== */
-
-/* 淡化条纹 + 颗粒星光，非重复式几何叠加 */
 .theme-gov.bg-tiles {
   background:
-    /* 隐约的红白流动带（不规则角度+透明混合） */
-    linear-gradient(12deg,
-      rgba(180,10,27,0.035) 0%,
-      rgba(255,255,255,0.015) 35%,
-      rgba(180,10,27,0.035) 70%,
-      rgba(255,255,255,0.015) 100%
+    /* 半透明斜向红白带（轻条纹感） */
+    linear-gradient(15deg,
+      rgba(178, 34, 52, 0.08) 0%,
+      rgba(255, 255, 255, 0.05) 8%,
+      rgba(178, 34, 52, 0.08) 16%,
+      rgba(255, 255, 255, 0.05) 24%,
+      rgba(178, 34, 52, 0.08) 32%,
+      rgba(255, 255, 255, 0.05) 40%,
+      rgba(178, 34, 52, 0.08) 48%,
+      rgba(255, 255, 255, 0.05) 56%,
+      rgba(178, 34, 52, 0.08) 64%,
+      rgba(255, 255, 255, 0.05) 72%,
+      rgba(178, 34, 52, 0.08) 80%,
+      rgba(255, 255, 255, 0.05) 88%,
+      rgba(178, 34, 52, 0.08) 100%
     ),
-    /* 散布的微星点 */
-    radial-gradient(circle at 15% 20%, rgba(255,255,255,0.06) 1px, transparent 2px),
-    radial-gradient(circle at 40% 80%, rgba(255,255,255,0.04) 1px, transparent 3px),
-    radial-gradient(circle at 70% 60%, rgba(255,255,255,0.05) 1px, transparent 3px),
-    radial-gradient(circle at 90% 10%, rgba(255,255,255,0.04) 1px, transparent 3px),
-    /* 原本的网格瓷砖 */
-    repeating-linear-gradient(0deg, rgba(0,0,0,0.025) 0, rgba(0,0,0,0.025) 1px, transparent 1px, transparent 8px),
-    repeating-linear-gradient(90deg, rgba(0,0,0,0.025) 0, rgba(0,0,0,0.025) 1px, transparent 1px, transparent 8px);
-  background-blend-mode: overlay, screen, screen, screen, multiply, multiply;
-  background-size: auto, 1200px 800px, 1000px 700px, 800px 600px, auto, auto;
+    /* 微星光层 */
+    radial-gradient(circle at 10% 20%, rgba(255,255,255,0.12) 1px, transparent 2px),
+    radial-gradient(circle at 45% 75%, rgba(255,255,255,0.10) 1px, transparent 2px),
+    radial-gradient(circle at 70% 50%, rgba(255,255,255,0.09) 1px, transparent 3px),
+    radial-gradient(circle at 90% 10%, rgba(255,255,255,0.08) 1px, transparent 3px),
+    /* 原有网格 */
+    repeating-linear-gradient(0deg, rgba(0,0,0,0.02) 0, rgba(0,0,0,0.02) 1px, transparent 1px, transparent 8px),
+    repeating-linear-gradient(90deg, rgba(0,0,0,0.02) 0, rgba(0,0,0,0.02) 1px, transparent 1px, transparent 8px);
+  background-blend-mode: overlay, screen, screen, screen, screen, multiply, multiply;
+  background-size: auto, 900px 700px, 800px 600px, 700px 500px, 600px 400px, auto, auto;
   background-position: center;
 }
