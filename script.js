@@ -60,3 +60,14 @@
     });
   }
 })();
+
+function copyTemplate(btn) {
+  const text = btn.parentElement.querySelector('pre').innerText;
+  navigator.clipboard.writeText(text).then(() => {
+    btn.textContent = 'Copied!';
+    setTimeout(() => btn.textContent = 'Copy', 2000);
+  }).catch(err => {
+    console.error('复制失败:', err);
+    btn.textContent = 'Error';
+  });
+}
