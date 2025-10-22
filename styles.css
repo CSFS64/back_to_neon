@@ -556,36 +556,7 @@ body.contrast-high .ticker { background: #010; border-color: #0f0; }
   background: linear-gradient(180deg,#ffffff 0%,#eaeaea 100%);
 }
 
-
-
-
-
-
-/* ===============================
-   🇺🇸 Subtle Flag Texture 3.0 — 强化版可见星条纹理
-   =============================== */
-.theme-gov.bg-tiles {
-  background:
-    /* 半透明斜向红白带（轻条纹感） */
-    linear-gradient(15deg,
-      rgba(178, 34, 52, 0.08) 0%,
-      rgba(255, 255, 255, 0.05) 8%,
-      rgba(178, 34, 52, 0.08) 16%,
-      rgba(255, 255, 255, 0.05) 24%,
-      rgba(178, 34, 52, 0.08) 32%,
-      rgba(255, 255, 255, 0.05) 40%,
-      rgba(178, 34, 52, 0.08) 48%,
-      rgba(255, 255, 255, 0.05) 56%,
-      rgba(178, 34, 52, 0.08) 64%,
-      rgba(255, 255, 255, 0.05) 72%,
-      rgba(178, 34, 52, 0.08) 80%,
-      rgba(255, 255, 255, 0.05) 88%,
-      rgba(178, 34, 52, 0.08) 100%
-    ),
-    /* 微星光层 */
-    radial-gradient(circle at 10% 20%, rgba(255,255,255,0.12) 1px, transparent 2px),
-    radial-gradient(circle at 45% 75%, rgba(255,255,255,0.10) 1px, transparent 2px),
-    radial-gradient(circle at 70% 50%, rgba(255,255,255,0.09) 1px, transparent 3px),
+,0.09) 1px, transparent 3px),
     radial-gradient(circle at 90% 10%, rgba(255,255,255,0.08) 1px, transparent 3px),
     /* 原有网格 */
     repeating-linear-gradient(0deg, rgba(0,0,0,0.02) 0, rgba(0,0,0,0.02) 1px, transparent 1px, transparent 8px),
