@@ -587,21 +587,3 @@ body.contrast-high .ticker { background: #010; border-color: #0f0; }
   background-size: auto, 1200px 800px, 1000px 700px, 800px 600px, auto, auto;
   background-position: center;
 }
-
-/* 顶部 logo 区：柔和星幕光泽 */
-.theme-gov .logo-area {
-  background: linear-gradient(180deg, #1b3a6b 0%, #0d2445 100%);
-  color: #fff;
-  position: relative;
-  box-shadow: inset 0 -3px 0 #b40a1b;
-}
-.theme-gov .logo-area::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(circle at 25% 40%, rgba(255,255,255,0.1) 1px, transparent 3px),
-              radial-gradient(circle at 60% 70%, rgba(255,255,255,0.07) 1px, transparent 3px);
-  background-size: 180px 180px;
-  opacity: 0.3;
-  pointer-events: none;
-}
