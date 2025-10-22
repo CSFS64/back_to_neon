@@ -274,10 +274,12 @@
           
               <div class="subbox">
                 <div class="subbox-head">邮件正文模板（复制即可）</div>
-                  <div class="copy-block">
-                    <button class="copy-btn" onclick="copyTemplate(this)">Copy</button>
+                  <div class="copy-card">
+                    <div class="copy-head">
+                      <span class="copy-title">【反馈 Feedback】</span>
+                      <button class="copy-btn" type="button" onclick="copyTemplate(this)" aria-label="复制反馈模板">Copy</button>
+                    </div>
                     <pre>
-                  【反馈 Feedback】
                   Subject: [Feedback] Kalyna OSINT — （一句话概括）
                   正文：
                   - 我在（Frontline/Hub/其他）遇到的问题或建议：
@@ -286,8 +288,15 @@
                   - 可协助的部分（可选）：
                   ——
                   署名 / 联系方式：
+                    </pre>
+                  </div>
                   
-                  【申请 Application】
+                  <div class="copy-card">
+                    <div class="copy-head">
+                      <span class="copy-title">【申请 Application】</span>
+                      <button class="copy-btn" type="button" onclick="copyTemplate(this)" aria-label="复制申请模板">Copy</button>
+                    </div>
+                    <pre>
                   Subject: [Application] Kalyna OSINT — 姓名 / 擅长领域
                   正文：
                   - 基本介绍（城市/时区、可投入时间）：
