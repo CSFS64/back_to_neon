@@ -555,3 +555,53 @@ body.contrast-high .ticker { background: #010; border-color: #0f0; }
 .theme-gov .copy-btn:hover {
   background: linear-gradient(180deg,#ffffff 0%,#eaeaea 100%);
 }
+
+
+
+
+
+
+/* ===============================
+   🇺🇸 Subtle Flag Texture 2.0
+   =============================== */
+
+/* 淡化条纹 + 颗粒星光，非重复式几何叠加 */
+.theme-gov.bg-tiles {
+  background:
+    /* 隐约的红白流动带（不规则角度+透明混合） */
+    linear-gradient(12deg,
+      rgba(180,10,27,0.035) 0%,
+      rgba(255,255,255,0.015) 35%,
+      rgba(180,10,27,0.035) 70%,
+      rgba(255,255,255,0.015) 100%
+    ),
+    /* 散布的微星点 */
+    radial-gradient(circle at 15% 20%, rgba(255,255,255,0.06) 1px, transparent 2px),
+    radial-gradient(circle at 40% 80%, rgba(255,255,255,0.04) 1px, transparent 3px),
+    radial-gradient(circle at 70% 60%, rgba(255,255,255,0.05) 1px, transparent 3px),
+    radial-gradient(circle at 90% 10%, rgba(255,255,255,0.04) 1px, transparent 3px),
+    /* 原本的网格瓷砖 */
+    repeating-linear-gradient(0deg, rgba(0,0,0,0.025) 0, rgba(0,0,0,0.025) 1px, transparent 1px, transparent 8px),
+    repeating-linear-gradient(90deg, rgba(0,0,0,0.025) 0, rgba(0,0,0,0.025) 1px, transparent 1px, transparent 8px);
+  background-blend-mode: overlay, screen, screen, screen, multiply, multiply;
+  background-size: auto, 1200px 800px, 1000px 700px, 800px 600px, auto, auto;
+  background-position: center;
+}
+
+/* 顶部 logo 区：柔和星幕光泽 */
+.theme-gov .logo-area {
+  background: linear-gradient(180deg, #1b3a6b 0%, #0d2445 100%);
+  color: #fff;
+  position: relative;
+  box-shadow: inset 0 -3px 0 #b40a1b;
+}
+.theme-gov .logo-area::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 25% 40%, rgba(255,255,255,0.1) 1px, transparent 3px),
+              radial-gradient(circle at 60% 70%, rgba(255,255,255,0.07) 1px, transparent 3px);
+  background-size: 180px 180px;
+  opacity: 0.3;
+  pointer-events: none;
+}
