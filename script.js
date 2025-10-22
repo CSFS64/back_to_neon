@@ -61,13 +61,23 @@
   }
 })();
 
-function copyTemplate(btn) {
-  const text = btn.parentElement.querySelector('pre').innerText;
-  navigator.clipboard.writeText(text).then(() => {
+function copyTemplate(btn){
+  var pre = btn.closest('.copy-card').querySelector('pre');
+  var text = pre ? pre.innerText : '';
+  if (!text) return;
+
+  // 复制到剪贴板
+  navigator.clipboard.writeText(text).then(function(){
+    var old = btn.textContent;
     btn.textContent = 'Copied!';
-    setTimeout(() => btn.textContent = 'Copy', 2000);
-  }).catch(err => {
-    console.error('复制失败:', err);
-    btn.textContent = 'Error';
+    setTimeout(function(){ btn.textContent = old; }, 1800);
+  }).catch(function(){
+    // 兜底：选中文本，让用户手动 Ctrl/Cmd+C
+    var r = document.createRange();
+    r.selectNodeContents(pre);
+    var sel = window.getSelection();
+    sel.removeAllRanges(); sel.addRange(r);
+    alert('已选中内容，请按 Ctrl/Cmd + C 复制');
   });
 }
+
