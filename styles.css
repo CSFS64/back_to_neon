@@ -41,6 +41,12 @@
 }
 .warning-box a.inline-link:hover { outline: 1px dotted #004ea2; }
 
+.theme-gov .warning-box {
+  border-left: 4px solid var(--gov-red);
+  background: linear-gradient(180deg,#fffaf0 0%,#fff3e0 100%);
+  box-shadow: 2px 2px 0 #000;
+}
+
 /* =========================================================
    通用小工具
    ========================================================= */
