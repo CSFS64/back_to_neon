@@ -1,6 +1,6 @@
 // scripts/pull_updates.js
 // Node >= 18（自带 fetch）
-// 环境变量：RSS_URLS（支持“平台名+空格+URL”一行一个，或仅 URL）
+// 环境变量：RSS_URLS（“平台名+空格+URL”一行一个，或仅 URL）
 // 可选：MAX_ITEMS（默认 120），EXCERPT_LEN（默认 180）
 
 import fs from "node:fs/promises";
