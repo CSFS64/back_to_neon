@@ -35,7 +35,7 @@
   }
   .khb__bar{
     pointer-events: auto;
-    max-width: 1080px; width: calc(100% - 24px);
+    max-width: clamp(720px, 66vw, 1440px);
     display: flex; align-items: center; gap: 10px;
     height: 40px; padding: 0 14px;
     background: rgba(255,255,255,.93);
