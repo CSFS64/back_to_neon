@@ -1,33 +1,40 @@
 // scripts/pull_updates.js
 // Node >= 18（自带 fetch）
-// 环境变量：RSS_URLS（换行/逗号分隔多个源；你现在主要用 Zhihu）
+// 环境变量：RSS_URLS（支持“平台名+空格+URL”一行一个，或仅 URL）
 // 可选：MAX_ITEMS（默认 120），EXCERPT_LEN（默认 180）
 
 import fs from "node:fs/promises";
 
-// ---------- 环境配置 ----------
-const RSS_URLS = (process.env.RSS_URLS || "")
-  .split(/[\n,]/)
-  .map(s => s.trim())
-  .filter(Boolean);
-
-if (!RSS_URLS.length) {
+/* ------------------------ 读取与解析源列表 ------------------------ */
+// 允许以下两种写法混用：
+//   Zhihu https://rsshub.app/zhihu/people/pins/xxx
+//   https://rsshub.app/zhihu/people/activities/xxx
+const RAW = process.env.RSS_URLS || "";
+const LINES = RAW.split(/\n|,/).map(s => s.trim()).filter(Boolean);
+if (!LINES.length) {
   console.error("ERROR: 环境变量 RSS_URLS 为空。请在 GitHub Secrets 里设置。");
   process.exit(1);
 }
+const SOURCES = LINES.map(line => {
+  const m = line.match(/^(\S+)\s+(https?:\/\/\S+)$/i);
+  return m ? { platform: m[1], url: m[2] } : { platform: "", url: line };
+});
 
-const MAX_ITEMS    = parseInt(process.env.MAX_ITEMS    || "120", 10);
-const EXCERPT_LEN  = parseInt(process.env.EXCERPT_LEN  || "180", 10);
-const OUT_PATH     = "data/updates.json";
+const MAX_ITEMS   = parseInt(process.env.MAX_ITEMS   || "120", 10);
+const EXCERPT_LEN = parseInt(process.env.EXCERPT_LEN || "180", 10);
+const OUT_PATH    = "data/updates.json";
 
-// ---------- 主流程 ----------
+/* ------------------------ 主流程：抓取 → 解析 → 统一映射 ------------------------ */
 const all = [];
-for (const url of RSS_URLS) {
+for (const src of SOURCES) {
+  const url  = src.url;
+  const hint = src.platform || platformFromURL(url); // 平台名优先取行首指定；否则按域名猜
   try {
-    const xml   = await fetchText(url);
-    const items = parseRSS(xml);
-    const mapped = items.map(it => mapToUnified(it, { platformHint: "Zhihu", excerptLen: EXCERPT_LEN }));
+    const xml    = await fetchText(url);
+    const items  = parseRSS(xml);
+    const mapped = items.map(it => mapToUnified(it, { platformHint: hint, excerptLen: EXCERPT_LEN }));
     all.push(...mapped);
+    console.log(`[RSS] ${hint} ${url} -> ${items.length} items`);
   } catch (e) {
     console.error(`WARN: 抓取失败 ${url}:`, String(e).slice(0, 200));
   }
@@ -43,8 +50,7 @@ await fs.mkdir("data", { recursive: true });
 await fs.writeFile(OUT_PATH, JSON.stringify(result, null, 2), "utf8");
 console.log(`OK: 写入 ${OUT_PATH}，共 ${result.length} 条。`);
 
-
-// ---------- 工具函数 ----------
+/* ------------------------ 工具函数区 ------------------------ */
 async function fetchText(url) {
   const res = await fetch(url, { headers: { "User-Agent": "KalynaOSINT-RSS/1.0" } });
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -55,13 +61,13 @@ async function fetchText(url) {
 function parseRSS(xml) {
   const blocks = xml.split(/<item>/).slice(1).map(b => "<item>" + b);
   return blocks.map(it => ({
-    title: pick(it, /<title><!\[CDATA\[(.*?)\]\]><\/title>|<title>(.*?)<\/title>/s),
-    link: pick(it, /<link>(.*?)<\/link>/s),
-    guid: pick(it, /<guid[^>]*>(.*?)<\/guid>/s),
-    pubDate: pick(it, /<pubDate>(.*?)<\/pubDate>/s),
+    title:       pick(it, /<title><!\[CDATA\[(.*?)\]\]><\/title>|<title>(.*?)<\/title>/s),
+    link:        pick(it, /<link>(.*?)<\/link>/s),
+    guid:        pick(it, /<guid[^>]*>(.*?)<\/guid>/s),
+    pubDate:     pick(it, /<pubDate>(.*?)<\/pubDate>/s),
     description: pick(it, /<description><!\[CDATA\[(.*?)\]\]><\/description>|<description>(.*?)<\/description>/s),
-    content: pick(it, /<content:encoded><!\[CDATA\[(.*?)\]\]><\/content:encoded>/s),
-    summary: pick(it, /<summary><!\[CDATA\[(.*?)\]\]><\/summary>|<summary>(.*?)<\/summary>/s)
+    content:     pick(it, /<content:encoded><!\[CDATA\[(.*?)\]\]><\/content:encoded>/s),
+    summary:     pick(it, /<summary><!\[CDATA\[(.*?)\]\]><\/summary>|<summary>(.*?)<\/summary>/s)
   }));
 }
 function pick(s, re) {
@@ -69,7 +75,7 @@ function pick(s, re) {
   return (m && (m[1] || m[2])) ? (m[1] || m[2]).trim() : "";
 }
 
-// —— HTML 实体反转（足够应对常见实体） ——
+// HTML 实体反转（足够应对常见实体）
 function unescapeEntities(s = "") {
   return String(s)
     .replace(/&lt;/g, "<")
@@ -79,21 +85,21 @@ function unescapeEntities(s = "") {
     .replace(/&#39;/g, "'");
 }
 
-// —— 日期规范化：转成 YYYY-MM-DD ——
+// 日期规范化：转成 YYYY-MM-DD
 function isoDate(pubDate = "") {
   const d = new Date(pubDate);
   if (!Number.isNaN(+d)) return d.toISOString().slice(0, 10);
   const m = String(pubDate).match(/(\d{4})[-/](\d{2})[-/](\d{2})/);
   if (m) return `${m[1]}-${m[2]}-${m[3]}`;
-  return ""; // 实在不行就留空
+  return "";
 }
 
-// —— 去标签、压缩空白（含实体反转） ——
+// 去标签、压缩空白（含实体反转）
 function stripHTML(s = "") {
   return unescapeEntities(s).replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
 }
 
-// —— 提取首图（兼容 src / data-xxx / srcset / og:image） ——
+// 提取首图（兼容 src / data-xxx / srcset / og:image）
 function extractFirstImage(html = "") {
   const h = unescapeEntities(html);
 
@@ -119,17 +125,41 @@ function extractFirstImage(html = "") {
   return "";
 }
 
-// —— 统一映射（标题/摘要/图片/日期都做兜底与清洗） ——
+// 从 pins/activities 的正文里“炼出”更像标题的一句话
+function deriveTitleFromPins(rawHTML = "", fallbackText = "") {
+  const h = unescapeEntities(rawHTML);
+
+  // 1) 去掉开头的“作者 + 冒号”，例如 <a>Kalyna OSINT</a>： 或 纯文本的 Kalyna OSINT：
+  let s = h.replace(/^\s*(?:<a\b[^>]*>.*?<\/a>|[\u4e00-\u9fa5A-Za-z0-9 _.-]{2,})\s*[:：]\s*/i, "");
+
+  // 2) 优先取第一个 <div> 的内容；否则取第一个 <br> 之前的片段
+  const divMatch = s.match(/<div[^>]*>([\s\S]*?)<\/div>/i);
+  if (divMatch) {
+    s = divMatch[1];
+  } else {
+    s = s.split(/<br\s*\/?>/i)[0];
+  }
+
+  // 3) 去标签 → 纯文本；去掉开头标点/空白
+  let text = stripHTML(s).replace(/^[\s:：，、。.!?'"“”‘’\-—]+/, "").trim();
+
+  // 4) 兜底（拿不到就用全文/备用）
+  if (!text) text = stripHTML(h) || fallbackText || "(无标题)";
+
+  // 5) 限长
+  return text.length > 36 ? text.slice(0, 36) + "…" : text;
+}
+
+// 统一映射（标题/摘要/图片/日期都做兜底与清洗）
 function mapToUnified(it, { platformHint = "", excerptLen = 180 } = {}) {
-  const raw  = it.content || it.description || it.summary || "";
-  const text = stripHTML(raw);
-  const image = extractFirstImage(raw);
+  const raw    = it.content || it.description || it.summary || "";
+  const text   = stripHTML(raw);
+  const image  = extractFirstImage(raw);
 
   let title = (it.title || "").trim();
   if (!title) {
-    // 没有 <title> 时，用正文首句或前 36 字作为标题
-    title = (text.split(/[。.!?\n]/)[0] || text).slice(0, 36);
-    if (!title) title = "(无标题)";
+    // pins/activities 常无 <title>，从正文抽一条更像标题的句子
+    title = deriveTitleFromPins(raw, text);
   }
 
   return {
@@ -142,6 +172,18 @@ function mapToUnified(it, { platformHint = "", excerptLen = 180 } = {}) {
     tags: [],
     excerpt: text.slice(0, excerptLen)
   };
+}
+
+// 分平台猜测（当没在行首给出平台名时）
+function platformFromURL(u = "") {
+  try {
+    const h = new URL(u).hostname;
+    if (h.includes("zhihu")) return "知乎";
+    if (h.includes("twitter") || h.includes("x.com")) return "X";
+    if (h.includes("bilibili")) return "哔哩哔哩";
+    if (h.includes("csfs64.github.io") || h.includes("freeland")) return "FreeLand";
+  } catch {}
+  return "RSS";
 }
 
 function dedupeByKey(arr, keyFn) {
