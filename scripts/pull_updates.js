@@ -66,14 +66,16 @@ function pick(s, re) {
   return (m[1] || m[2] || "").trim();
 }
 
+// 用 summary 兜底；保证 title/excerpt 都有值
 function mapToUnified(it, { platformHint = "", excerptLen = 180 } = {}) {
-  const raw = it.content || it.description || "";
+  const raw = it.content || it.description || it.summary || "";
   const image = extractFirstImage(raw);
   const text = stripHTML(raw);
+  const title = (it.title || "").trim() || text.split(/[。.!?\n]/)[0] || "(无标题)";
   return {
-    id: it.guid || it.link || it.title,
-    title: it.title || "(无标题)",
-    date: (it.pubDate || "").slice(0, 10),     // YYYY-MM-DD
+    id: it.guid || it.link || title,
+    title,
+    date: String(it.pubDate || "").slice(0, 10),
     platform: platformHint || "RSS",
     url: it.link || "",
     image: image || "",
@@ -82,9 +84,15 @@ function mapToUnified(it, { platformHint = "", excerptLen = 180 } = {}) {
   };
 }
 
+// 兼容常见图片属性：src / data-original / data-actualsrc / data-src
 function extractFirstImage(html) {
-  const m = html.match(/<img[^>]+src=["']([^"']+)["']/i);
-  return m ? m[1] : "";
+  const attrs = ['src', 'data-original', 'data-actualsrc', 'data-src'];
+  for (const a of attrs) {
+    const re = new RegExp(`<img[^>]+${a}=["']([^"']+)["']`, 'i');
+    const m = html.match(re);
+    if (m) return m[1];
+  }
+  return "";
 }
 
 function stripHTML(s) {
