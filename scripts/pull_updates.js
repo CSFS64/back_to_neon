@@ -180,24 +180,27 @@ function mapToUnified(it, { platformHint = "", excerptLen = 180 } = {}) {
   const raw    = it.content || it.description || it.summary || "";
   const text   = stripHTML(raw);
   const image  = extractFirstImage(raw);
+  const cleanRaw  = raw.replace(/^\s*Kalyna\s*OSINT\s*[:：-]\s*/i, "");
+  const cleanText = text.replace(/^\s*Kalyna\s*OSINT\s*[:：-]\s*/i, "");
 
-  let title = (it.title || "").trim();
-  if (!title) {
-    // pins/activities 常无 <title>，从正文抽一条更像标题的句子
-    title = deriveTitleFromPins(raw, text);
-  }
 
-  return {
-    id: it.guid || it.link || title,
-    title,
-    date: isoDate(it.pubDate || ""),
-    platform: platformHint || "RSS",
-    url: it.link || "",
-    image: image || "",
-    tags: extractTags(raw, text),
-    excerpt: text.slice(0, excerptLen)
-  };
+    let title = (it.title || "").trim();
+    if (!title) {
+      title = deriveTitleFromPins(cleanRaw, cleanText);
+    }
+  
+    return {
+      id: it.guid || it.link || title,
+      title,
+      date: isoDate(it.pubDate || ""),
+      platform: platformHint || "RSS",
+      url: it.link || "",
+      image: image || "",
+      tags: [],
+      excerpt: cleanText.slice(0, excerptLen)
+    };
 }
+
 
 // 平台判断
 function platformFromURL(u = "") {
