@@ -81,13 +81,10 @@ function copyTemplate(btn){
   });
 }
 
-// ===== Kalyna Updates Loader =====
-(function(){
-  const DATA_URL = 'data/updates.json';     // JSON 路径
-  const PAGE_SIZE = 9;                      // 每页卡片数
-  let allUpdates = [];
-  let filtered = [];
-  let page = 1;
+// ===== Kalyna Updates Loader (clean titles, excerpt, cover, paging=3) =====
+(function () {
+  const DATA_URL = 'data/updates.json?ts=' + Date.now();
+  const PAGE_SIZE = 3; // ← 默认显示 3 条
 
   const elList = document.getElementById('updatesList');
   const elMore = document.getElementById('updatesLoadMore');
@@ -96,30 +93,31 @@ function copyTemplate(btn){
   const btnApply = document.getElementById('filterApply');
   const btnReset = document.getElementById('filterReset');
 
-  if(!elList) return; // 当前页没有 Updates 区域
+  if (!elList) return;
 
-  fetch(DATA_URL, {cache:'no-store'})
-    .then(r => r.json())
+  let allUpdates = [];
+  let filtered = [];
+  let page = 1;
+
+  fetch(DATA_URL, { cache: 'no-store' })
+    .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
     .then(json => {
-      // 1) 规整 + 按日期倒序
-      allUpdates = (json || []).slice().sort((a,b) => (b.date || '').localeCompare(a.date || ''));
-      // 2) 初始筛选（全部）
+      if (!Array.isArray(json)) throw new Error('updates.json 不是数组');
+      allUpdates = json.slice().sort((a, b) => (b.date || '').localeCompare(a.date || ''));
       applyFilter();
-      // 3) 绑定事件
-      btnApply?.addEventListener('click', () => { applyFilter(); });
-      btnReset?.addEventListener('click', () => { selPlatform.value=''; inpTag.value=''; applyFilter(); });
-      elMore?.addEventListener('click', () => { page++; render(); });
+      btnApply && btnApply.addEventListener('click', applyFilter);
+      btnReset && btnReset.addEventListener('click', () => { if (selPlatform) selPlatform.value = ''; if (inpTag) inpTag.value = ''; applyFilter(); });
+      elMore && elMore.addEventListener('click', () => { page++; render(); });
     })
     .catch(err => {
-      console.error('Load updates.json failed:', err);
-      elList.innerHTML = `<div class="warning-box"><b>提示：</b>暂时无法加载更新列表，请稍后再试。</div>`;
+      elList.innerHTML = `<div class="warning-box"><b>加载失败：</b>${String(err.message || err)}</div>`;
     });
 
-  function applyFilter(){
-    const plat = (selPlatform?.value || '').trim();
-    const tag = (inpTag?.value || '').trim().toLowerCase();
+  function applyFilter() {
+    const plat = (selPlatform && selPlatform.value || '').trim();
+    const tag = (inpTag && inpTag.value || '').trim().toLowerCase();
     filtered = allUpdates.filter(it => {
-      const okPlat = !plat || it.platform === plat;
+      const okPlat = !plat || String(it.platform) === plat;
       const okTag = !tag || (Array.isArray(it.tags) && it.tags.some(t => String(t).toLowerCase().includes(tag)));
       return okPlat && okTag;
     });
@@ -127,47 +125,68 @@ function copyTemplate(btn){
     render();
   }
 
-  function render(){
-    const start = 0, end = PAGE_SIZE * page;
-    const slice = filtered.slice(start, end);
-
-    // 建立一个 id -> item 索引，方便 prev/next/related 拼接
+  function render() {
+    const end = PAGE_SIZE * page;
+    const slice = filtered.slice(0, end);
     const byId = new Map(allUpdates.map(it => [it.id, it]));
 
-    elList.innerHTML = slice.map(it => cardHTML(it, byId)).join('');
-    // 控制 “加载更多”
-    if(elMore){
-      elMore.hidden = filtered.length <= end;
+    if (slice.length === 0) {
+      elList.innerHTML = `<div class="warning-box"><b>无结果：</b>请清空筛选后再试。</div>`;
+      if (elMore) elMore.hidden = true;
+      return;
     }
+
+    elList.innerHTML = slice.map(it => cardHTML(it, byId)).join('');
+    if (elMore) elMore.hidden = filtered.length <= end;
+  }
+
+  const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  function decodeEntities(s){
+    const ta = document.createElement('textarea'); ta.innerHTML = String(s ?? ''); return ta.value;
+  }
+  function stripTags(s){ return String(s ?? '').replace(/<[^>]*>/g, ' ').replace(/\s+/g,' ').trim(); }
+  function clampText(s, n){ s = String(s ?? ''); return s.length > n ? s.slice(0, n-1) + '…' : s; }
+
+  function safeTitle(it){
+    const t = (it.title && String(it.title).trim()) || '';
+    if (t) return t;
+    const body = stripTags(decodeEntities(it.excerpt || it.description || ''));
+    return clampText(body, 36);
+  }
+
+  function safeExcerpt(it){
+    const text = stripTags(decodeEntities(it.excerpt || it.description || ''));
+    return clampText(text, 220);
+  }
+
+  function coverURL(it){
+    return it.image ? String(it.image) : '';
   }
 
   function cardHTML(it, byId){
-    const cover = it.image ? `<img class="update-cover" src="${esc(it.image)}" alt="${esc(it.title)} 封面">` : '';
-    const meta = [
-      it.date ? `<span><b>DATE:</b> ${esc(it.date)}</span>` : '',
-      it.platform ? `<span><b>PLATFORM:</b> ${esc(it.platform)}</span>` : ''
-    ].filter(Boolean).join('  •  ');
+    const title = safeTitle(it);
+    const excerpt = safeExcerpt(it);
+    const cover = coverURL(it);
 
-    // 上下篇与相关
-    const prev = it.prev && byId.get(it.prev) ? byId.get(it.prev) : null;
-    const next = it.next && byId.get(it.next) ? byId.get(it.next) : null;
+    const prev = it.prev && byId.get(it.prev);
+    const next = it.next && byId.get(it.next);
     const related = Array.isArray(it.related) ? it.related.map(id => byId.get(id)).filter(Boolean) : [];
 
     const prevLink = prev ? `<a href="#updates" data-jump="${esc(prev.id)}" class="inline-link">上一篇</a>` : '';
     const nextLink = next ? `<a href="#updates" data-jump="${esc(next.id)}" class="inline-link">下一篇</a>` : '';
-    const relatedLinks = related.length ? related.map(r => `<a href="#updates" data-jump="${esc(r.id)}" class="inline-link">${esc(r.title)}</a>`).join('、') : '';
+    const relatedLinks = related.length ? related.map(r => `<a href="#updates" data-jump="${esc(r.id)}" class="inline-link">${esc(safeTitle(r))}</a>`).join('、') : '';
 
-    // 注意：标题指向原文；卡片内另给 “阅读原文” 按钮
     return `
       <article class="update-card" role="listitem" itemscope itemtype="https://schema.org/Article" id="${esc(it.id)}">
-        ${cover}
+        ${cover ? `<img class="update-cover" loading="lazy" src="${esc(cover)}" alt="${esc(title)} 封面">` : ''}
         <div class="update-body">
           <h3 class="update-title">
-            <a class="inline-link" href="${esc(it.url)}" target="_blank" rel="noopener" itemprop="headline">${esc(it.title)}</a>
+            <a class="inline-link" href="${esc(it.url)}" target="_blank" rel="noopener" itemprop="headline">${esc(title)}</a>
           </h3>
-          <div class="update-meta">${meta}</div>
-          ${it.excerpt ? `<p class="update-excerpt" itemprop="description">${esc(it.excerpt)}</p>` : ''}
-
+          <div class="update-meta">
+            ${it.date ? `<span><b>DATE:</b> ${esc(it.date)}</span>` : ''} ${it.platform ? ` • <span><b>PLATFORM:</b> ${esc(it.platform)}</span>` : ''}
+          </div>
+          ${excerpt ? `<p class="update-excerpt" itemprop="description">${esc(excerpt)}</p>` : ''}
           <div class="update-links">
             <a class="inline-link" href="${esc(it.url)}" target="_blank" rel="noopener">阅读原文 ↗</a>
             ${prevLink} ${nextLink}
@@ -178,18 +197,15 @@ function copyTemplate(btn){
     `;
   }
 
-  // 简易转义
-  function esc(s){ return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
-
-  // 内部跳转（点击“上一篇/下一篇/相关”时滚到对应卡片）
+  // 内部跳转（上一篇/下一篇/相关）
   document.addEventListener('click', (e) => {
-    const a = e.target.closest('a[data-jump]');
-    if(!a) return;
+    const a = e.target.closest && e.target.closest('a[data-jump]');
+    if (!a) return;
     e.preventDefault();
     const id = a.getAttribute('data-jump');
     const target = document.getElementById(id);
-    if(target){
-      target.scrollIntoView({behavior:'smooth', block:'start'});
+    if (target) {
+      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
       target.classList.add('blink');
       setTimeout(() => target.classList.remove('blink'), 1200);
     }
