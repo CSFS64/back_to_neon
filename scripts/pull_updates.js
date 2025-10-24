@@ -169,7 +169,7 @@ function mapToUnified(it, { platformHint = "", excerptLen = 180 } = {}) {
     platform: platformHint || "RSS",
     url: it.link || "",
     image: image || "",
-    tags: [],
+    tags: extractTags(raw, text),
     excerpt: text.slice(0, excerptLen)
   };
 }
