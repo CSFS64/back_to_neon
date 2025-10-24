@@ -1,0 +1,41 @@
+name: Pull Zhihu to updates.json
+
+on:
+  schedule:
+    - cron: "*/30 * * * *"   # 每 30 分钟跑一次（UTC）
+  workflow_dispatch: {}       # 手动触发按钮
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write    # 允许推送回仓库
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Pull & Transform
+        env:
+          RSS_URLS: ${{ secrets.RSS_URLS }}
+          MAX_ITEMS: "150"       # 可按需调整
+          EXCERPT_LEN: "180"
+        run: |
+          node -e "console.log('Node version', process.version)"
+          node scripts/pull_updates.js
+
+      - name: Commit changes
+        run: |
+          if [[ -n "$(git status --porcelain)" ]]; then
+            git config user.name  "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add data/updates.json
+            git commit -m "chore: refresh updates.json from RSS"
+            git push
+          else
+            echo "No changes"
+          fi
