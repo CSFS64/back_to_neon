@@ -125,6 +125,31 @@ function extractFirstImage(html = "") {
   return "";
 }
 
+function extractTags(raw = "", text = "") {
+  const s = unescapeEntities(raw) + " " + (text || "");
+  const tags = new Set();
+
+  // 1) #Hashtag 形态：#Avdiivka #FPV
+  const hash = s.match(/#([\p{L}\p{N}_\-]{2,30})/gu) || [];
+  for (const m of hash) tags.add(m.slice(1));
+
+  // 2) [方括号] 形态：[Avdiivka] [Frontline]
+  const br = s.match(/\[([^\[\]]{2,30})\]/g) || [];
+  for (const m of br) tags.add(m.slice(1, -1));
+
+  // 3) 自定义关键字映射
+  const TAG_MAP = [
+    { re: /\bavdiivka\b/i, norm: "Avdiivka" },
+    { re: /\bfpv\b/i, norm: "FPV" },
+    { re: /\bdrone\b/i, norm: "Drone" },
+  ];
+  for (const { re, norm } of TAG_MAP) {
+    if (re.test(s)) tags.add(norm);
+  }
+
+  return Array.from(tags).slice(0, 8);
+}
+
 // 从 pins/activities 的正文里“炼出”更像标题的一句话
 function deriveTitleFromPins(rawHTML = "", fallbackText = "") {
   const h = unescapeEntities(rawHTML);
