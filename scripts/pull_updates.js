@@ -129,7 +129,7 @@ function extractFirstImage(html = "") {
 function deriveTitleFromPins(rawHTML = "", fallbackText = "") {
   const h = unescapeEntities(rawHTML);
 
-  // 1) 去掉开头的“作者 + 冒号”，例如 <a>Kalyna OSINT</a>： 或 纯文本的 Kalyna OSINT：
+  // 1) 去掉开头的“作者 + 冒号”
   let s = h.replace(/^\s*(?:<a\b[^>]*>.*?<\/a>|[\u4e00-\u9fa5A-Za-z0-9 _.-]{2,})\s*[:：]\s*/i, "");
 
   // 2) 优先取第一个 <div> 的内容；否则取第一个 <br> 之前的片段
@@ -143,14 +143,14 @@ function deriveTitleFromPins(rawHTML = "", fallbackText = "") {
   // 3) 去标签 → 纯文本；去掉开头标点/空白
   let text = stripHTML(s).replace(/^[\s:：，、。.!?'"“”‘’\-—]+/, "").trim();
 
-  // 4) 兜底（拿不到就用全文/备用）
+  // 4) 兜底
   if (!text) text = stripHTML(h) || fallbackText || "(无标题)";
 
   // 5) 限长
   return text.length > 36 ? text.slice(0, 36) + "…" : text;
 }
 
-// 统一映射（标题/摘要/图片/日期都做兜底与清洗）
+// 统一映射
 function mapToUnified(it, { platformHint = "", excerptLen = 180 } = {}) {
   const raw    = it.content || it.description || it.summary || "";
   const text   = stripHTML(raw);
@@ -174,7 +174,7 @@ function mapToUnified(it, { platformHint = "", excerptLen = 180 } = {}) {
   };
 }
 
-// 分平台猜测（当没在行首给出平台名时）
+// 平台判断
 function platformFromURL(u = "") {
   try {
     const h = new URL(u).hostname;
