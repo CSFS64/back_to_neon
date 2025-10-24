@@ -1,19 +1,17 @@
-/* Kalyna Hub Banner — single-file (style+logic)
+/* Kalyna Hub Banner — centered bar that auto-hides to a thin edge
  * Reads latest from {base}/data/updates.json
  * data attributes:
  *   data-base          : site root, must end with '/'
- *   data-updates-json  : override updates.json URL
- *   data-updates-link  : "view" link URL (default {base}#updates)
- *   data-start         : 'bar' | 'mini'  (default 'bar')
- *   data-automin       : ms to auto collapse to mini (default 2200; 0=never)
- *   data-left          : mini mode left offset in px (default 64)
+ *   data-updates-json  : override updates.json URL (default {base}data/updates.json)
+ *   data-updates-link  : "view" link URL        (default {base}#updates)
+ *   data-autohide      : ms before auto hide to edge (default 2200; 0 = never)
+ *   data-edge          : edge height in px when hidden (default 6)
  */
 (() => {
   const cur = document.currentScript || (function(){const s=document.getElementsByTagName('script');return s[s.length-1];})();
   const guessBase = (src) => {
     try {
       const u = new URL(src, location.href);
-      // https://user.github.io/repo/assets/hub-banner.js -> https://user.github.io/repo/
       const parts = u.pathname.split('/').filter(Boolean);
       if (parts.length >= 2) return `${u.origin}/${parts[0]}/${parts[1]}/`;
       return `${u.origin}/`;
@@ -23,24 +21,32 @@
   const BASE   = (cur.dataset.base || '').trim() || guessBase(cur.src || '');
   const JSONU  = (cur.dataset.updatesJson || (BASE + 'data/updates.json')).trim();
   const VIEW   = (cur.dataset.updatesLink || (BASE + '#updates')).trim();
-  const START  = (cur.dataset.start || 'bar').toLowerCase();      // 'bar' | 'mini'
-  const AUTOMS = Math.max(0, parseInt(cur.dataset.automin ?? '2200', 10));  // 0 = no auto collapse
-  const LEFTPX = String(cur.dataset.left ?? '64');                 // mini offset
+  const AUTO   = Math.max(0, parseInt(cur.dataset.autohide ?? '2200', 10));
+  const EDGE   = Math.max(0, parseInt(cur.dataset.edge ?? '6', 10)); // px
 
   // ---------- inject CSS ----------
   const css = `
-  :root{ --khb-left: ${LEFTPX}px; }
-  .khb{ position:fixed; top:0; left:0; right:0; z-index:10000;
-        font-family: system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif; }
+  :root{ --khb-edge: ${EDGE}px; }
+  .khb{
+    position: fixed; inset: 0 0 auto 0; z-index: 10000;
+    display: flex; justify-content: center; pointer-events: none;
+    transform: translateY(0); transition: transform .28s ease;
+    font-family: system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+  }
   .khb__bar{
-    max-width:1080px; margin:0 auto; display:flex; align-items:center; gap:10px;
-    height:38px; padding:0 14px; background:rgba(255,255,255,.90);
-    border:1px solid rgba(0,0,0,.1); border-top:none; border-radius:0 0 12px 12px;
-    box-shadow:0 8px 22px rgba(0,0,0,.15); -webkit-backdrop-filter:blur(8px); backdrop-filter:blur(8px);
+    pointer-events: auto;
+    max-width: 1080px; width: calc(100% - 24px);
+    display: flex; align-items: center; gap: 10px;
+    height: 40px; padding: 0 14px;
+    background: rgba(255,255,255,.93);
+    border: 1px solid rgba(0,0,0,.10);
+    border-top: none; border-radius: 0 0 12px 12px;
+    box-shadow: 0 10px 24px rgba(0,0,0,.18);
+    -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
   }
   .khb__home{ color:#111; font-weight:800; text-decoration:none; letter-spacing:0; }
   .khb__meta{ display:flex; gap:8px; align-items:center; font-size:13px; min-width:0; }
-  .khb__date{ opacity:.8; white-space:nowrap; }
+  .khb__date{ opacity:.78; white-space:nowrap; }
   .khb__title{ min-width:0; max-width:46ch; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
   .khb__link{ color:#0b63c5; font-weight:700; text-decoration:none; border-bottom:1px dotted currentColor; }
   .khb__link:hover{ text-decoration:underline; }
@@ -48,24 +54,25 @@
   .khb__new{ display:inline-flex; align-items:center; font-size:.7rem;
              padding:0 .4rem; border:1px solid #000; background:#ffec99; border-color:#f1c40f; color:#000; font-weight:800; }
 
+  /* dark preference */
   @media (prefers-color-scheme: dark){
-    .khb__bar{ background:rgba(18,18,18,.85); border-color:rgba(255,255,255,.12); color:#eaeaea; }
+    .khb__bar{ background: rgba(18,18,18,.86); border-color: rgba(255,255,255,.12); color:#eaeaea; }
     .khb__home{ color:#fff; } .khb__link{ color:#6fb0ff; }
   }
 
-  /* mini mode */
-  .khb.khb--mini{ top:10px; left:var(--khb-left); right:auto; }
-  .khb.khb--mini .khb__bar{ height:34px; padding:0 10px; border-radius:12px; border-top:1px solid rgba(0,0,0,.12); }
-  .khb.khb--mini .khb__date{ display:none; }
-  .khb.khb--mini .khb__title{ max-width:24ch; }
-  .khb.khb--mini:hover .khb__title{ max-width:36ch; }
+  /* hidden-to-edge state: slide up leaving a thin edge */
+  .khb.khb--edge{ transform: translateY(calc(-100% + var(--khb-edge))); }
+  /* When hidden, hover the edge to reveal */
+  .khb.khb--edge:hover{ transform: translateY(0); }
 
-  @media (max-width:640px){
-    :root{ --khb-left: ${Math.max(0, parseInt(LEFTPX,10)-16)}px; }
-    .khb__title{ max-width:28ch; }
-    .khb.khb--mini .khb__title{ max-width:18ch; }
+  /* mobile tweaks */
+  @media (max-width: 640px){
+    .khb__title{ max-width: 28ch; }
   }
-  @media (prefers-reduced-motion:no-preference){ .khb__new{ animation:none; } }
+
+  @media (prefers-reduced-motion: reduce){
+    .khb{ transition: none; }
+  }
   `;
   const style = document.createElement('style');
   style.textContent = css;
@@ -89,7 +96,7 @@
     </div>
     <noscript><div style="padding:.5rem .75rem;border-bottom:1px solid #000;">已禁用脚本：请访问主页查看最新分析。</div></noscript>
   `;
-  const mount = () => (document.body||document.documentElement).insertBefore(wrap, document.body?.firstChild||null);
+  const mount = () => (document.body||document.documentElement).appendChild(wrap);
   if (document.readyState==='loading') document.addEventListener('DOMContentLoaded', mount); else mount();
 
   // ---------- helpers ----------
@@ -102,7 +109,6 @@
   const pickDate  = (it) => String(it?.date || '');
   const sortByDateDesc = (arr=[]) => arr.slice().sort((a,b)=>pickDate(b).localeCompare(pickDate(a)));
 
-  // ---------- load latest from updates.json ----------
   const loadLatest = async () => {
     const url = JSONU + (JSONU.includes('?') ? '&' : '?') + 'ts=' + Date.now();
     const r = await fetch(url);
@@ -112,29 +118,31 @@
     return sortByDateDesc(data)[0];
   };
 
-  loadLatest().then(item => {
-    const d = pickDate(item), t = pickTitle(item), u = pickURL(item);
-    if (d) elDate.textContent = d;
-    if (t) elTitle.textContent = t;
-    if (u) elView.href = u;
+  const enterEdgeLater = () => {
+    if (AUTO > 0) setTimeout(() => wrap.classList.add('khb--edge'), AUTO);
+  };
 
+  // 点击“查看分析/主页”后把 NEW 清零
+  const bindRead = (d) => {
     try {
       const key='khb:lastSeen', last=localStorage.getItem(key)||'';
       if (d && (!last || d>last)) elNew.hidden = false;
       const mark = ()=>{ if(d) localStorage.setItem(key,d); };
       elView?.addEventListener('click', mark); elHome?.addEventListener('click', mark);
     } catch {}
+  };
 
-    // start mode + auto collapse
-    if (START==='mini') wrap.classList.add('khb--mini');
-    if (AUTOMS>0 && START!=='mini') setTimeout(()=>wrap.classList.add('khb--mini'), AUTOMS);
+  loadLatest().then(item => {
+    const d = pickDate(item), t = pickTitle(item), u = pickURL(item);
+    if (d) elDate.textContent = d;
+    if (t) elTitle.textContent = t;
+    if (u) elView.href = u;
 
-    // click toggle (useful on map)
-    wrap.addEventListener('click', () => wrap.classList.toggle('khb--mini'));
+    bindRead(d);
+    enterEdgeLater();
   }).catch(err => {
     elTitle.textContent = '（无法获取最新信息）';
     console.error('[KHB] failed:', err?.message||err, 'URL:', JSONU);
-    if (START==='mini') wrap.classList.add('khb--mini');
-    if (AUTOMS>0 && START!=='mini') setTimeout(()=>wrap.classList.add('khb--mini'), AUTOMS);
+    enterEdgeLater();
   });
 })();
