@@ -35,6 +35,7 @@
         <!-- 顶部蓝色分栏导航 -->
         <nav class="topbar" aria-label="Primary">
           <a href="#about" class="tab active">ABOUT</a>
+          <a href="#updates" class="tab">UPDATES</a>
           <a href="#projects" class="tab">PROJECTS</a>
           <a href="#Resources" class="tab">RESOURCES</a>
           <a href="#contrib" class="tab">CONTRIBUTE</a>
@@ -68,6 +69,7 @@
             <div class="nav-title">导航（Navigation）</div>
             <ul class="nav-list">
               <li><a href="#about">关于我们（About）</a></li>
+              <li><a href="#updates">更新与分析（Updates）</a></li>
               <li><a href="#projects">项目与网站（Projects）</a></li>
               <li><a href="#Resources">工具与资源（Resources）</a></li>
               <li><a href="#contrib">如何参与（Contribute）</a></li>
@@ -135,6 +137,42 @@
               目前仍处于最后的开发阶段，你仅能看到随机的测试内容且无法注册并使用点赞评论转发等功能，正式发布后我们将在官方账号另行通知。
             </li>
           </ul>
+
+          <!-- 更新与分析 -->
+          <section class="section-box">
+            <div class="section-head">
+              <span class="section-tag">SECTION</span>
+              <h2 id="updates" class="section-title">更新与分析（Updates）</h2>
+            </div>
+            <div class="section-body">
+              <!-- 筛选器（按平台/标签） -->
+              <div class="updates-controls" aria-label="Updates Filters">
+                <select id="filterPlatform" aria-label="按平台筛选">
+                  <option value="">全部平台</option>
+                  <option value="Zhihu">Zhihu</option>
+                  <option value="X">X (Twitter)</option>
+                  <option value="Bilibili">Bilibili</option>
+                  <option value="FreeLand">FreeLand</option>
+                </select>
+                <input id="filterTag" type="search" placeholder="按标签筛选（如: Avdiivka）" aria-label="按标签筛选">
+                <button type="button" id="filterApply" class="copy-btn">筛选</button>
+                <button type="button" id="filterReset" class="copy-btn">重置</button>
+              </div>
+          
+              <!-- 列表容器 -->
+              <div id="updatesList" class="updates-grid" role="list"></div>
+          
+              <!-- 分页/加载更多 -->
+              <div class="updates-more center">
+                <button type="button" id="updatesLoadMore" class="copy-btn" hidden>加载更多</button>
+              </div>
+          
+              <!-- 说明 -->
+              <div class="box note" style="margin-top:10px;">
+                <b>提示：</b>蓝色标题或“阅读原文”可点击跳转至原平台；卡片底部可跳转到早期/相关分析。
+              </div>
+            </div>
+          </section>
 
           <!-- 工具与资源 -->
           <h2 id="Resources" class="highlight-yellow">工具与资源（Resources）</h2>
