@@ -177,10 +177,20 @@ function mapToUnified(it, { platformHint = "", excerptLen = 180 } = {}) {
 // 平台判断
 function platformFromURL(u = "") {
   try {
-    const h = new URL(u).hostname;
+    const { hostname: h0, pathname: p0 } = new URL(u);
+    const h = String(h0).toLowerCase();
+    const p = String(p0).toLowerCase();
+
+    // 1) RSSHub 路由（优先按 pathname 判断）
+    if (p.startsWith("/zhihu/")) return "Zhihu";
+    if (p.startsWith("/bilibili/")) return "Bilibili";
+    if (p.startsWith("/twitter/") || p.startsWith("/x/")) return "X";
+    if (p.includes("/freeland/")) return "FreeLand";
+
+    // 2) 直连站点（非 RSSHub）
     if (h.includes("zhihu")) return "Zhihu";
-    if (h.includes("twitter") || h.includes("x.com")) return "X";
     if (h.includes("bilibili")) return "Bilibili";
+    if (h.includes("twitter") || h.includes("x.com")) return "X";
     if (h.includes("csfs64.github.io") || h.includes("freeland")) return "FreeLand";
   } catch {}
   return "RSS";
