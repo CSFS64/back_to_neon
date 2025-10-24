@@ -84,10 +84,6 @@
   wrap.setAttribute('role', 'region');
   wrap.setAttribute('aria-label', 'Kalyna OSINT Hub');
   
-  // 读取基础链接与更新区地址
-  const BASE = cur.dataset.base || "https://csfs64.github.io/back_to_neon/";
-  const VIEW = cur.dataset.updates || `${BASE}#updates`;
-  
   wrap.innerHTML = `
     <div class="khb__bar">
       <a class="khb__home" id="khbHome" href="${BASE}">Kalyna OSINT</a>
