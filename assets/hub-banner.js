@@ -117,7 +117,7 @@
 
   const clean = (s='') => String(s).replace(/\s+/g,' ').trim();
   const pickTitle = (it) => clean(it?.title || '') || clean(it?.excerpt || '').slice(0,36) || '（无标题）';
-  const pickURL   = (it) => (it?.url && String(it.url)) || VIEW;
+  const pickURL   = () => VIEW;
   const pickDate  = (it) => String(it?.date || '');
   const sortByDateDesc = (arr=[]) => arr.slice().sort((a,b)=>pickDate(b).localeCompare(pickDate(a)));
 
