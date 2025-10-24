@@ -178,9 +178,9 @@ function mapToUnified(it, { platformHint = "", excerptLen = 180 } = {}) {
 function platformFromURL(u = "") {
   try {
     const h = new URL(u).hostname;
-    if (h.includes("zhihu")) return "知乎";
+    if (h.includes("zhihu")) return "Zhihu";
     if (h.includes("twitter") || h.includes("x.com")) return "X";
-    if (h.includes("bilibili")) return "哔哩哔哩";
+    if (h.includes("bilibili")) return "Bilibili";
     if (h.includes("csfs64.github.io") || h.includes("freeland")) return "FreeLand";
   } catch {}
   return "RSS";
