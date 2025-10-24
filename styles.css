@@ -625,3 +625,17 @@ body.contrast-high .ticker { background: #010; border-color: #0f0; }
 /* 主题融合微调 */
 .theme-gov .update-card{ box-shadow:1px 1px 0 #000; }
 .theme-gov .update-links a:hover{ outline:1px dotted var(--gov-blue); }
+
+/* 标题/摘要多行省略，卡片更整洁 */
+.update-title a{
+  display:-webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;      /* 标题 1 行省略 */
+  overflow:hidden;
+}
+.update-excerpt{
+  display:-webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 5;      /* 摘要最多 5 行 */
+  overflow:hidden;
+}
