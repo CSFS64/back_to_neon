@@ -1,11 +1,38 @@
+/* Kalyna Hub Banner — read latest from data/updates.json
+ * by CSFS64 — v1.0
+ * 用法（工具页中）：
+ * <script src="https://csfs64.github.io/back_to_neon/assets/hub-banner.js"
+ *         data-base="https://csfs64.github.io/back_to_neon/"
+ *         data-updates-link="https://csfs64.github.io/back_to_neon/#updates"
+ *         defer></script>
+ */
 (() => {
-  // 读取配置（来自 <script> 标签 data- 属性）
-  const curScript = document.currentScript;
-  const KHB_BASE    = (curScript && curScript.dataset.base)    || location.origin + '/';
-  const KHB_LATEST  = (curScript && curScript.dataset.latest)  || (KHB_BASE + 'data/latest.json');
-  const KHB_UPDATES = (curScript && curScript.dataset.updates) || (KHB_BASE + '#updates');
+  // ===== 读取 <script> data- 配置 =====
+  const curScript = document.currentScript || (function () {
+    const scripts = document.getElementsByTagName('script');
+    return scripts[scripts.length - 1];
+  })();
 
-  // 注入样式
+  // 主站根（必须以 / 结尾）；默认尝试从 script src 推断
+  const guessBaseFromSrc = (src) => {
+    try {
+      const u = new URL(src, location.href);
+      // 取到 /<repo>/ 前缀，例如 https://user.github.io/repo/assets/hub-banner.js → https://user.github.io/repo/
+      const parts = u.pathname.split('/').filter(Boolean);
+      if (parts.length >= 2) {
+        return `${u.origin}/${parts[0]}/${parts[1]}/`;
+      }
+      return `${u.origin}/`;
+    } catch { return location.origin + '/'; }
+  };
+
+  const KHB_BASE = (curScript?.dataset?.base) || guessBaseFromSrc(curScript?.src || '');
+  // updates.json 的地址（允许覆写）；默认用 {BASE}/data/updates.json
+  const KHB_UPDATES_JSON = (curScript?.dataset?.updatesJson) || (KHB_BASE + 'data/updates.json');
+  // “查看分析”跳转链接（允许覆写），默认 {BASE}#updates
+  const KHB_UPDATES_LINK = (curScript?.dataset?.updatesLink) || (KHB_BASE + '#updates');
+
+  // ===== 注入样式（作用域独立）=====
   const css = `
   .khb{position:sticky;top:0;z-index:1000;font-family:var(--mono-stack,ui-monospace,monospace)}
   .khb__bar{display:flex;align-items:center;gap:.75rem;border-bottom:1px solid #000;background:#f9fbff;color:#111;padding:.45rem .75rem;box-shadow:0 1px 0 rgba(0,0,0,.12)}
@@ -23,7 +50,7 @@
   style.textContent = css;
   document.head.appendChild(style);
 
-  // 构建 DOM
+  // ===== 构建 DOM 并挂载到 <body> 顶部 =====
   const wrap = document.createElement('div');
   wrap.className = 'khb';
   wrap.setAttribute('role','region');
@@ -35,43 +62,75 @@
       <div class="khb__meta">
         <span class="khb__date">最新更新：<b id="khbDate">—</b></span>
         <span class="khb__title" id="khbTitle">（加载中…）</span>
-        <a class="khb__link" id="khbView" href="${KHB_UPDATES}">查看分析 ↗</a>
+        <a class="khb__link" id="khbView" href="${KHB_UPDATES_LINK}">查看分析 ↗</a>
         <span class="khb__new" id="khbNew" hidden>NEW</span>
       </div>
     </div>
     <noscript><div style="padding:.5rem .75rem;border-bottom:1px solid #000;">已禁用脚本：请访问主页查看最新分析。</div></noscript>
   `;
-  // 插入到 <body> 最前
-  (document.body ? document.body : document.documentElement).insertBefore(wrap, document.body?.firstChild || null);
+  const inject = () => {
+    const target = document.body || document.documentElement;
+    target.insertBefore(wrap, target.firstChild || null);
+  };
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', inject);
+  } else inject();
 
-  // 拉 latest.json（带时间戳防缓存）
-  const elDate  = wrap.querySelector('#khbDate');
-  const elTitle = wrap.querySelector('#khbTitle');
-  const elView  = wrap.querySelector('#khbView');
-  const elHome  = wrap.querySelector('#khbHome');
-  const elNew   = wrap.querySelector('#khbNew');
+  // ===== 辅助函数 =====
+  const byId = (sel) => wrap.querySelector(sel);
+  const elDate  = byId('#khbDate');
+  const elTitle = byId('#khbTitle');
+  const elView  = byId('#khbView');
+  const elHome  = byId('#khbHome');
+  const elNew   = byId('#khbNew');
 
-  fetch(KHB_LATEST + '?ts=' + Date.now())
-    .then(r => r.ok ? r.json() : Promise.reject(new Error('HTTP '+r.status)))
-    .then(data => {
-      const d = (data && data.date) ? String(data.date) : '';
-      const t = (data && data.title) ? String(data.title) : '';
-      const u = (data && data.url)   ? String(data.url)   : KHB_UPDATES;
+  const cleanText = (s='') => String(s).replace(/\s+/g,' ').trim();
+  const pickTitle = (it) => cleanText(it?.title || '') || cleanText(it?.excerpt || '').slice(0, 36) || '（无标题）';
+  const pickURL   = (it) => (it?.url && String(it.url)) || KHB_UPDATES_LINK;
+  const pickDate  = (it) => String(it?.date || '');
+
+  // 将数组按日期降序（YYYY-MM-DD 优先；否则字符串比较）
+  const sortByDateDesc = (arr=[]) => {
+    const copy = arr.slice();
+    copy.sort((a,b) => (pickDate(b)).localeCompare(pickDate(a)));
+    return copy;
+  };
+
+  // ===== 拉取 updates.json（带时间戳避缓存）=====
+  const loadLatestFromUpdates = async () => {
+    const url = KHB_UPDATES_JSON + (KHB_UPDATES_JSON.includes('?') ? '&' : '?') + 'ts=' + Date.now();
+    const res = await fetch(url);
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json();
+    if (!Array.isArray(data) || data.length === 0) throw new Error('updates.json empty');
+    const sorted = sortByDateDesc(data);
+    return sorted[0];
+  };
+
+  loadLatestFromUpdates()
+    .then(latestItem => {
+      const d = pickDate(latestItem);
+      const t = pickTitle(latestItem);
+      const u = pickURL(latestItem);
 
       if (d && elDate)  elDate.textContent = d;
       if (t && elTitle) elTitle.textContent = t;
-      if (elView) elView.href = u;
+      if (u && elView)  elView.href = u;
 
+      // NEW 徽标：若 d 比 lastSeen 新 → 显示
       try {
-        const last = localStorage.getItem('khb:lastSeen') || '';
+        const key = 'khb:lastSeen';
+        const last = localStorage.getItem(key) || '';
         if (d && (!last || d > last)) elNew.hidden = false;
-        const markRead = () => { if (d) localStorage.setItem('khb:lastSeen', d); };
+        const markRead = () => { if (d) localStorage.setItem(key, d); };
         elView && elView.addEventListener('click', markRead);
         elHome && elHome.addEventListener('click', markRead);
       } catch (e) {}
     })
     .catch(err => {
       if (elTitle) elTitle.textContent = '（无法获取最新信息）';
-      console.error('[KHB] latest fetch failed:', err && err.message || err);
+      // 控制台提示方便排障
+      console.error('[KHB] updates fetch failed:', err?.message || err);
+      console.error('[KHB] tried URL:', KHB_UPDATES_JSON);
     });
 })();
