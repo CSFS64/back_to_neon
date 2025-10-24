@@ -96,7 +96,7 @@
         <span class="khb__date">最新更新：<b id="khbDate">—</b></span>
         <span class="khb__title" id="khbTitle">（加载中…）</span>
         <!-- 改：统一回主站更新区 -->
-        <a class="khb__link" id="khbView" href="${VIEW}" target="_self">查看分析↗</a>
+        <a class="khb__link" id="khbView" href="${VIEW}" target="_self">查看分析🔍</a>
         <span class="khb__new" id="khbNew" hidden>NEW</span>
       </div>
     </div>
