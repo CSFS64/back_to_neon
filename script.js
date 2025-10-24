@@ -115,12 +115,23 @@ function copyTemplate(btn){
 
   function applyFilter() {
     const plat = (selPlatform && selPlatform.value || '').trim();
-    const tag = (inpTag && inpTag.value || '').trim().toLowerCase();
+    const q = (inpTag && inpTag.value || '').trim().toLowerCase();
+  
     filtered = allUpdates.filter(it => {
-      const okPlat = !plat || String(it.platform) === plat;
-      const okTag = !tag || (Array.isArray(it.tags) && it.tags.some(t => String(t).toLowerCase().includes(tag)));
-      return okPlat && okTag;
+      // 平台筛选（保持不变）
+      if (plat && String(it.platform) !== plat) return false;
+      // 关键词：搜 title / excerpt / tags
+      if (!q) return true;
+      const hay = [
+        it.title || '',
+        it.excerpt || '',
+        ...(Array.isArray(it.tags) ? it.tags : [])
+      ].join(' ').toLowerCase();
+  
+      // 支持多词：输入 "drone Avdiivka" 时，两个词都要命中
+      return q.split(/\s+/).every(w => w && hay.includes(w));
     });
+  
     page = 1;
     render();
   }
