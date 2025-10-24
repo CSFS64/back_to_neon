@@ -81,8 +81,13 @@
   // ---------- DOM ----------
   const wrap = document.createElement('div');
   wrap.className = 'khb';
-  wrap.setAttribute('role','region');
-  wrap.setAttribute('aria-label','Kalyna OSINT Hub');
+  wrap.setAttribute('role', 'region');
+  wrap.setAttribute('aria-label', 'Kalyna OSINT Hub');
+  
+  // 读取基础链接与更新区地址
+  const BASE = cur.dataset.base || "https://csfs64.github.io/back_to_neon/";
+  const VIEW = cur.dataset.updates || `${BASE}#updates`;
+  
   wrap.innerHTML = `
     <div class="khb__bar">
       <a class="khb__home" id="khbHome" href="${BASE}">Kalyna OSINT</a>
@@ -90,14 +95,25 @@
       <div class="khb__meta">
         <span class="khb__date">最新更新：<b id="khbDate">—</b></span>
         <span class="khb__title" id="khbTitle">（加载中…）</span>
-        <a class="khb__link" id="khbView" href="${VIEW}">查看分析 ↗</a>
+        <!-- 改：统一回主站更新区 -->
+        <a class="khb__link" id="khbView" href="${VIEW}" target="_self">查看分析↗</a>
         <span class="khb__new" id="khbNew" hidden>NEW</span>
       </div>
     </div>
-    <noscript><div style="padding:.5rem .75rem;border-bottom:1px solid #000;">已禁用脚本：请访问主页查看最新分析。</div></noscript>
+  
+    <noscript>
+      <div style="padding:.5rem .75rem;border-bottom:1px solid #000;">
+        已禁用脚本：请访问主页查看最新分析。
+      </div>
+    </noscript>
   `;
-  const mount = () => (document.body||document.documentElement).appendChild(wrap);
-  if (document.readyState==='loading') document.addEventListener('DOMContentLoaded', mount); else mount();
+  
+  const mount = () => (document.body || document.documentElement).appendChild(wrap);
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', mount);
+  } else {
+    mount();
+  }
 
   // ---------- helpers ----------
   const q = (sel) => wrap.querySelector(sel);
