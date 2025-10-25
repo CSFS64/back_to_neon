@@ -1,7 +1,7 @@
 // scripts/pull_updates.js
 // Node >= 18（自带 fetch）
 // 环境变量：RSS_URLS（“平台名+空格+URL”一行一个，或仅 URL）
-// 可选：MAX_ITEMS（默认 120），EXCERPT_LEN（默认 180）
+// 可选：MAX_ITEMS（全量库上限，默认 50000）EXCERPT_LEN（默认 180）LATEST_KEEP（默认 50）
 
 import fs from "node:fs/promises";
 
@@ -20,12 +20,16 @@ const SOURCES = LINES.map(line => {
   return m ? { platform: m[1], url: m[2] } : { platform: "", url: line };
 });
 
-const MAX_ITEMS   = parseInt(process.env.MAX_ITEMS   || "120", 10);
-const EXCERPT_LEN = parseInt(process.env.EXCERPT_LEN || "180", 10);
-const OUT_PATH    = "data/updates.json";
+const MAX_ITEMS    = parseInt(process.env.MAX_ITEMS    || "50000", 10); // 全量库硬上限
+const EXCERPT_LEN  = parseInt(process.env.EXCERPT_LEN  || "180",   10);
+const LATEST_KEEP  = parseInt(process.env.LATEST_KEEP  || "50",    10);
 
-/* ------------------------ 主流程：抓取 → 解析 → 统一映射 ------------------------ */
-const all = [];
+const OUT_DIR      = "data";
+const OUT_ALL      = `${OUT_DIR}/updates-all.json`; // 全量
+const OUT_LATEST   = `${OUT_DIR}/updates.json`;     // 最新 N 条（供 banner 等轻载）
+
+/* ------------------------ 主流程：抓取 → 解析 → 合并历史 ------------------------ */
+const fresh = [];
 for (const src of SOURCES) {
   const url  = src.url;
   const hint = src.platform || platformFromURL(url); // 平台名优先取行首指定；否则按域名猜
@@ -33,22 +37,32 @@ for (const src of SOURCES) {
     const xml    = await fetchText(url);
     const items  = parseRSS(xml);
     const mapped = items.map(it => mapToUnified(it, { platformHint: hint, excerptLen: EXCERPT_LEN }));
-    all.push(...mapped);
+    fresh.push(...mapped);
     console.log(`[RSS] ${hint} ${url} -> ${items.length} items`);
   } catch (e) {
     console.error(`WARN: 抓取失败 ${url}:`, String(e).slice(0, 200));
   }
 }
 
-// 去重（优先 guid>link>title），按日期倒序，截断总量
-const deduped = dedupeByKey(all, x => x.id || x.url || x.title);
-deduped.sort((a, b) => (b.date || "").localeCompare(a.date || ""));
-const result = deduped.slice(0, MAX_ITEMS);
+// 读旧档（全量库），合并去重
+await fs.mkdir(OUT_DIR, { recursive: true });
+let old = [];
+try {
+  const prev = await fs.readFile(OUT_ALL, "utf8");
+  old = JSON.parse(prev);
+  if (!Array.isArray(old)) old = [];
+} catch { old = []; }
 
-// 写入文件（若目录不存在则创建）
-await fs.mkdir("data", { recursive: true });
-await fs.writeFile(OUT_PATH, JSON.stringify(result, null, 2), "utf8");
-console.log(`OK: 写入 ${OUT_PATH}，共 ${result.length} 条。`);
+const merged = dedupeByKey([...fresh, ...old], x => x.id || x.url || x.title);
+merged.sort((a, b) => (b.date || "").localeCompare(a.date || ""));
+
+const trimmedAll = merged.slice(0, MAX_ITEMS);
+const latest     = merged.slice(0, LATEST_KEEP);
+
+// 写文件
+await fs.writeFile(OUT_ALL,    JSON.stringify(trimmedAll, null, 2), "utf8");
+await fs.writeFile(OUT_LATEST, JSON.stringify(latest,     null, 2), "utf8");
+console.log(`OK: 写入 ${OUT_ALL}（${trimmedAll.length} 条），以及 ${OUT_LATEST}（${latest.length} 条）。`);
 
 /* ------------------------ 工具函数区 ------------------------ */
 async function fetchText(url) {
@@ -125,30 +139,8 @@ function extractFirstImage(html = "") {
   return "";
 }
 
-function extractTags(raw = "", text = "") {
-  const s = unescapeEntities(raw) + " " + (text || "");
-  const tags = new Set();
-
-  // 1) #Hashtag 形态：#Avdiivka #FPV
-  const hash = s.match(/#([\p{L}\p{N}_\-]{2,30})/gu) || [];
-  for (const m of hash) tags.add(m.slice(1));
-
-  // 2) [方括号] 形态：[Avdiivka] [Frontline]
-  const br = s.match(/\[([^\[\]]{2,30})\]/g) || [];
-  for (const m of br) tags.add(m.slice(1, -1));
-
-  // 3) 自定义关键字映射
-  const TAG_MAP = [
-    { re: /\bavdiivka\b/i, norm: "Avdiivka" },
-    { re: /\bfpv\b/i, norm: "FPV" },
-    { re: /\bdrone\b/i, norm: "Drone" },
-  ];
-  for (const { re, norm } of TAG_MAP) {
-    if (re.test(s)) tags.add(norm);
-  }
-
-  return Array.from(tags).slice(0, 8);
-}
+// —— 统一清理“Kalyna OSINT:”等前缀（标题+正文）——
+const PREFIX_RE = /^\s*Kalyna\s*OSINT\s*[:：\-]\s*/i;
 
 // 从 pins/activities 的正文里“炼出”更像标题的一句话
 function deriveTitleFromPins(rawHTML = "", fallbackText = "") {
@@ -175,36 +167,6 @@ function deriveTitleFromPins(rawHTML = "", fallbackText = "") {
   return text.length > 36 ? text.slice(0, 36) + "…" : text;
 }
 
-// 统一映射
-function mapToUnified(it, { platformHint = "", excerptLen = 180 } = {}) {
-  const raw    = it.content || it.description || it.summary || "";
-  const text   = stripHTML(raw);
-  const image  = extractFirstImage(raw);
-
-  // —— 去掉正文与标题开头的“Kalyna OSINT:”等前缀（带各种冒号、破折号）——
-  const prefixRE = /^\s*Kalyna\s*OSINT\s*[:：\-]\s*/i;
-  const cleanRaw  = raw.replace(prefixRE, "");
-  const cleanText = text.replace(prefixRE, "");
-
-  let title = (it.title || "").trim().replace(prefixRE, ""); // 标题也清理
-  if (!title) {
-    // pins/activities 常无 <title>，从正文抽一条更像标题的句子
-    title = deriveTitleFromPins(cleanRaw, cleanText);
-    title = title.replace(prefixRE, "");
-  }
-
-  return {
-    id: it.guid || it.link || title,
-    title,
-    date: isoDate(it.pubDate || ""),
-    platform: platformHint || "RSS",
-    url: it.link || "",
-    image: image || "",
-    tags: [],
-    excerpt: cleanText.slice(0, excerptLen)
-  };
-}
-
 // 平台判断
 function platformFromURL(u = "") {
   try {
@@ -225,6 +187,59 @@ function platformFromURL(u = "") {
     if (h.includes("csfs64.github.io") || h.includes("freeland")) return "FreeLand";
   } catch {}
   return "RSS";
+}
+
+// —— 极简标签提取（可按需扩展）——
+function extractTags(raw = "", text = "") {
+  const s = unescapeEntities(raw) + " " + (text || "");
+  const tags = new Set();
+
+  // 1) #Hashtag 形态：#Avdiivka #FPV
+  const hash = s.match(/#([\p{L}\p{N}_\-]{2,30})/gu) || [];
+  for (const m of hash) tags.add(m.slice(1));
+
+  // 2) [方括号] 形态：[Avdiivka] [Frontline]
+  const br = s.match(/\[([^\[\]]{2,30})\]/g) || [];
+  for (const m of br) tags.add(m.slice(1, -1));
+
+  // 3) 自定义关键字映射
+  const TAG_MAP = [
+    { re: /\bavdiivka\b/i, norm: "Avdiivka" },
+    { re: /\bfpv\b/i,      norm: "FPV" },
+    { re: /\bdrone\b/i,    norm: "Drone" },
+  ];
+  for (const { re, norm } of TAG_MAP) {
+    if (re.test(s)) tags.add(norm);
+  }
+
+  return Array.from(tags).slice(0, 8);
+}
+
+// 统一映射
+function mapToUnified(it, { platformHint = "", excerptLen = 180 } = {}) {
+  const raw    = it.content || it.description || it.summary || "";
+  const text   = stripHTML(raw);
+  const image  = extractFirstImage(raw);
+
+  const cleanRaw  = raw.replace(PREFIX_RE, "");
+  const cleanText = text.replace(PREFIX_RE, "");
+
+  let title = (it.title || "").trim().replace(PREFIX_RE, "");
+  if (!title) {
+    // pins/activities 常无 <title>，从正文抽一条更像标题的句子
+    title = deriveTitleFromPins(cleanRaw, cleanText).replace(PREFIX_RE, "");
+  }
+
+  return {
+    id: it.guid || it.link || title,
+    title,
+    date: isoDate(it.pubDate || ""),
+    platform: platformHint || platformFromURL(it.link || "") || "RSS",
+    url: it.link || "",
+    image: image || "",
+    tags: extractTags(cleanRaw, cleanText),
+    excerpt: cleanText.slice(0, excerptLen)
+  };
 }
 
 function dedupeByKey(arr, keyFn) {
