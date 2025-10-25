@@ -83,7 +83,8 @@ function copyTemplate(btn){
 
 // ===== Kalyna Updates Loader (clean titles, excerpt, cover, paging=3) =====
 (function () {
-  const DATA_URL = 'data/updates.json?ts=' + Date.now();
+  const PRIMARY_URL = 'data/updates-all.json';
+  const FALLBACK_URL = 'data/updates.json';
   const PAGE_SIZE = 3; // ← 默认显示 3 条
 
   const elList = document.getElementById('updatesList');
@@ -99,27 +100,46 @@ function copyTemplate(btn){
   let filtered = [];
   let page = 1;
 
-  fetch(DATA_URL, { cache: 'no-store' })
-    .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+  fetchWithFallback([PRIMARY_URL, FALLBACK_URL])
     .then(json => {
-      if (!Array.isArray(json)) throw new Error('updates.json 不是数组');
+      if (!Array.isArray(json)) throw new Error('updates*.json 不是数组');
+      // 最新在前
       allUpdates = json.slice().sort((a, b) => (b.date || '').localeCompare(a.date || ''));
       applyFilter();
-      btnApply && btnApply.addEventListener('click', applyFilter);
-      btnReset && btnReset.addEventListener('click', () => { if (selPlatform) selPlatform.value = ''; if (inpTag) inpTag.value = ''; applyFilter(); });
-      elMore && elMore.addEventListener('click', () => { page++; render(); });
+
+      btnApply  && btnApply.addEventListener('click', applyFilter);
+      btnReset  && btnReset.addEventListener('click', () => {
+        if (selPlatform) selPlatform.value = '';
+        if (inpTag) inpTag.value = '';
+        applyFilter();
+      });
+      elMore    && elMore.addEventListener('click', () => { page++; render(); });
     })
     .catch(err => {
-      elList.innerHTML = `<div class="warning-box"><b>加载失败：</b>${String(err.message || err)}</div>`;
+      elList.innerHTML = `<div class="warning-box"><b>加载失败：</b>${esc(err.message || err)}</div>`;
     });
+
+  async function fetchWithFallback(urls){
+    let lastErr;
+    for (const u of urls){
+      try{
+        const url = u + (u.includes('?') ? '&' : '?') + 'ts=' + Date.now(); // 防缓存
+        const r = await fetch(url, { cache: 'no-store' });
+        if (!r.ok) throw new Error('HTTP ' + r.status);
+        return await r.json();
+      }catch(e){ lastErr = e; }
+    }
+    throw lastErr || new Error('无法获取更新数据');
+  }
 
   function applyFilter() {
     const plat = (selPlatform && selPlatform.value || '').trim();
     const q = (inpTag && inpTag.value || '').trim().toLowerCase();
-  
+
     filtered = allUpdates.filter(it => {
-      // 平台筛选（保持不变）
-      if (plat && String(it.platform) !== plat) return false;
+      // 平台筛选（严格匹配映射值：Zhihu / X / Bilibili / FreeLand / RSS）
+      if (plat && String(it.platform || '') !== plat) return false;
+
       // 关键词：搜 title / excerpt / tags
       if (!q) return true;
       const hay = [
@@ -127,11 +147,11 @@ function copyTemplate(btn){
         it.excerpt || '',
         ...(Array.isArray(it.tags) ? it.tags : [])
       ].join(' ').toLowerCase();
-  
-      // 支持多词：输入 "drone Avdiivka" 时，两个词都要命中
+
+      // 多词都要命中（支持输入 "drone Avdiivka"）
       return q.split(/\s+/).every(w => w && hay.includes(w));
     });
-  
+
     page = 1;
     render();
   }
@@ -152,9 +172,7 @@ function copyTemplate(btn){
   }
 
   const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-  function decodeEntities(s){
-    const ta = document.createElement('textarea'); ta.innerHTML = String(s ?? ''); return ta.value;
-  }
+  function decodeEntities(s){ const ta = document.createElement('textarea'); ta.innerHTML = String(s ?? ''); return ta.value; }
   function stripTags(s){ return String(s ?? '').replace(/<[^>]*>/g, ' ').replace(/\s+/g,' ').trim(); }
   function clampText(s, n){ s = String(s ?? ''); return s.length > n ? s.slice(0, n-1) + '…' : s; }
 
@@ -170,9 +188,7 @@ function copyTemplate(btn){
     return clampText(text, 220);
   }
 
-  function coverURL(it){
-    return it.image ? String(it.image) : '';
-  }
+  function coverURL(it){ return it.image ? String(it.image) : ''; }
 
   function cardHTML(it, byId){
     const title = safeTitle(it);
@@ -187,6 +203,7 @@ function copyTemplate(btn){
     const nextLink = next ? `<a href="#updates" data-jump="${esc(next.id)}" class="inline-link">下一篇</a>` : '';
     const relatedLinks = related.length ? related.map(r => `<a href="#updates" data-jump="${esc(r.id)}" class="inline-link">${esc(safeTitle(r))}</a>`).join('、') : '';
 
+    // 注意：你之前不想展示原始 URL，本卡片只在“阅读原文”按钮上跳外链；标题链接也可保留跳外链（按需改成内部锚点）
     return `
       <article class="update-card" role="listitem" itemscope itemtype="https://schema.org/Article" id="${esc(it.id)}">
         ${cover ? `<img class="update-cover" loading="lazy" src="${esc(cover)}" alt="${esc(title)} 封面">` : ''}
