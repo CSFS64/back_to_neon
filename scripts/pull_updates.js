@@ -13,7 +13,7 @@ const RAW = process.env.RSS_URLS || "";
 const LINES = RAW.split(/\r?\n|,/).map(s => s.trim()).filter(Boolean);
 if (!LINES.length) {
   console.error("ERROR: 环境变量 RSS_URLS 为空。请在 GitHub Secrets 里设置。");
-  process.exit(1);
+  process.exit(0); // 不让 Action 红
 }
 const SOURCES = LINES.map(line => {
   const m = line.match(/^(\S+)\s+(https?:\/\/\S+)$/i);
@@ -35,7 +35,7 @@ for (const src of SOURCES) {
   const hint = src.platform || platformFromURL(url); // 平台名优先取行首指定；否则按域名猜
   try {
     const xml    = await fetchText(url);
-    console.log(`[DEBUG] sniff=`, /<feed[\s>]/i.test(xml) ? 'Atom' : 'RSS', ' len=', xml.length, ' url=', url);
+    console.log(`[DEBUG] sniff=`, /<feed[\s>]/i.test(xml) ? 'Atom' : 'RSS', 'len=', xml.length, 'url=', url);
     const items  = parseFeed(xml);        // ← 兼容 RSS/Atom
     const mapped = items.map(it => mapToUnified(it, { platformHint: hint, excerptLen: EXCERPT_LEN }));
     fresh.push(...mapped);
@@ -68,8 +68,8 @@ const latest     = merged.slice(0, LATEST_KEEP);
 
 // 如果 merged 还是空（首次跑且抓不到），也不要写空文件
 if (trimmedAll.length === 0) {
-  console.error("[ERROR] 抓取与历史均为空，取消写入。请检查 RSS_URLS 或源可用性。");
-  process.exit(2);
+  console.warn("[WARN] 抓取与历史均为空，取消写入。请检查 RSS_URLS 或源可用性。");
+  process.exit(0);
 }
 
 // 写文件
