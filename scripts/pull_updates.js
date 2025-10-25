@@ -15,9 +15,15 @@ if (!LINES.length) {
   console.error("ERROR: 环境变量 RSS_URLS 为空。请在 GitHub Secrets 里设置。");
   process.exit(0); // 不让 Action 红
 }
-const SOURCES = LINES.map(line => {
+const SOURCES = LINES.map((line) => {
   const m = line.match(/^(\S+)\s+(https?:\/\/\S+)$/i);
   return m ? { platform: m[1], url: m[2] } : { platform: "", url: line };
+});
+
+console.log(`[DEBUG] SOURCES count=${SOURCES.length}`);
+for (const s of SOURCES) {
+  const safeUrl = (s.url || "").replace(/https?:\/\/([^\/]+)/i, (m, host) => `https://${host}`);
+  console.log(`[DEBUG] src platform="${s.platform}" url="${safeUrl.slice(0,120)}"`);
 });
 
 const MAX_ITEMS   = parseInt(process.env.MAX_ITEMS   || "50000", 10); // 全量库硬上限
@@ -37,6 +43,9 @@ for (const src of SOURCES) {
     const xml    = await fetchText(url);
     console.log(`[DEBUG] sniff=`, /<feed[\s>]/i.test(xml) ? 'Atom' : 'RSS', 'len=', xml.length, 'url=', url);
     const items  = parseFeed(xml);        // ← 兼容 RSS/Atom
+    if (!items || !Array.isArray(items) || items.length === 0) {
+      console.warn(`[WARN] parseFeed returned 0 items for ${url}`);
+    }
     const mapped = items.map(it => mapToUnified(it, { platformHint: hint, excerptLen: EXCERPT_LEN }));
     fresh.push(...mapped);
     console.log(`[RSS] ${hint} ${url} -> ${items.length} items`);
@@ -78,10 +87,34 @@ await fs.writeFile(OUT_LATEST, JSON.stringify(latest,     null, 2), "utf8");
 console.log(`OK: 写入 ${OUT_ALL}（${trimmedAll.length} 条），以及 ${OUT_LATEST}（${latest.length} 条）。`);
 
 /* ------------------------ 工具函数区 ------------------------ */
-async function fetchText(url) {
-  const res = await fetch(url, { headers: { "User-Agent": "KalynaOSINT-RSS/1.0" } });
-  if (!res.ok) throw new Error(`HTTP ${res.status}`);
-  return await res.text();
+async function fetchText(url, { tries = 3, timeoutMs = 15000 } = {}) {
+  const headers = {
+    "User-Agent": "KalynaOSINT-RSS/1.0",
+    "Accept": "application/rss+xml, application/atom+xml, application/xml, text/xml, text/html; q=0.8, */*; q=0.1",
+  };
+  let lastErr = null;
+  for (let i = 1; i <= tries; i++) {
+    const ctrl = new AbortController();
+    const t = setTimeout(() => ctrl.abort(), timeoutMs);
+    try {
+      const res = await fetch(url, { headers, redirect: "follow", signal: ctrl.signal });
+      const txt = await res.text();
+      clearTimeout(t);
+      if (!res.ok) {
+        throw new Error(`HTTP ${res.status} len=${txt?.length ?? 0}`);
+      }
+      if (!txt || txt.length < 50) {
+        throw new Error(`Empty/too short response (len=${txt?.length ?? 0})`);
+      }
+      return txt;
+    } catch (e) {
+      clearTimeout(t);
+      lastErr = e;
+      console.warn(`[WARN] fetch ${i}/${tries} failed for ${url}: ${String(e).slice(0,200)}`);
+      await new Promise(r => setTimeout(r, 500 * i)); // 退避
+    }
+  }
+  throw lastErr || new Error("Fetch failed");
 }
 
 // —— 解析 RSS（<rss><item>）或 Atom（<feed><entry>）——
@@ -89,7 +122,12 @@ function parseFeed(xml) {
   const isAtom = /<feed[\s>]/i.test(xml) && /<entry[\s>]/i.test(xml);
   if (!isAtom) {
     // RSS 2.0：更稳健的 <item> 匹配
-    const blocks = xml.split(/<item\b[^>]*>/i).slice(1).map(b => "<item>" + b);
+    let blocks = xml.split(/<item\b[^>]*>/i).slice(1).map(b => "<item>" + b);
+    if (blocks.length === 0) {
+      // 兜底：直接全局抓取 <item>…</item>
+      const rough = xml.match(/<item\b[^>]*>[\s\S]*?<\/item>/ig) || [];
+      blocks = rough;
+    }
     return blocks.map(it => ({
       title:       pick(it, /<title(?:>|\s[^>]*>)(?:<!\[CDATA\[(.*?)\]\]>|([^<]*))<\/title>/is),
       link:        pick(it, /<link(?:>|\s[^>]*>)([^<]+)<\/link>/is),
