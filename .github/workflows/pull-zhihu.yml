@@ -2,99 +2,40 @@ name: Pull Zhihu to updates.json
 
 on:
   schedule:
-    - cron: "*/30 * * * *"
-  workflow_dispatch: {}
+    - cron: "*/30 * * * *"   # 每 30 分钟跑一次（UTC）
+  workflow_dispatch: {}       # 手动触发按钮
 
 jobs:
   build:
     runs-on: ubuntu-latest
     permissions:
-      contents: write
-
+      contents: write    # 允许推送回仓库
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          persist-credentials: true
-          fetch-depth: 0
-          ref: ${{ github.ref_name }}   # ✅ 保证在当前分支
-
-      - name: Show branch & last commit
-        run: |
-          git rev-parse --abbrev-ref HEAD
-          git log -1 --oneline
 
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: 20
 
-      - name: Echo RSS_URLS length (debug)
-        env:
-          RSS_URLS: ${{ secrets.RSS_URLS }}
-        run: |
-          echo "RSS_URLS length: ${#RSS_URLS}"
-          echo "RSS_URLS head: ${RSS_URLS:0:200}"
-
       - name: Pull & Transform
         env:
           RSS_URLS: ${{ secrets.RSS_URLS }}
-          MAX_ITEMS: "50000"
+          MAX_ITEMS: "150"       # 可按需调整
           EXCERPT_LEN: "180"
-          LATEST_KEEP: "50"
         run: |
-          node -e "console.log('Node', process.version)"
+          node -e "console.log('Node version', process.version)"
           node scripts/pull_updates.js
 
-      - name: Show results (workspace)
+      - name: Commit changes
         run: |
-          set -e
-          ls -lah data || true
-          for f in data/updates-all.json data/updates.json; do
-            if [ -f "$f" ]; then
-              echo "--- FILE: $f ---"
-              stat -c '%y %n' "$f" || true
-              sha256sum "$f" || true
-              head -c 300 "$f" || true
-              echo
-            else
-              echo "MISSING: $f"
-            fi
-          done
-
-      - name: Commit & Push changes
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          set -e
-          BRANCH="$(git rev-parse --abbrev-ref HEAD)"
-          echo "Current branch: $BRANCH"
-
-          git config user.name  "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-
-          # 避免非快进
-          git pull --rebase origin "$BRANCH" || true
-
-          # 提交本次更新（将 data 下的两个文件加进去）
-          git add -A data
-
-          echo "---- staged diff ----"
-          git diff --staged --stat || true
-
-          if git diff --staged --quiet; then
-            echo "No changes to commit (likely identical content)."
-            exit 0
+          if [[ -n "$(git status --porcelain)" ]]; then
+            git config user.name  "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add data/updates.json
+            git commit -m "chore: refresh updates.json from RSS"
+            git push
+          else
+            echo "No changes"
           fi
-
-          git commit -m "chore: update RSS outputs (auto)"
-          git push origin "$BRANCH"
-
-      - name: Show repo file state after push (fetch)
-        run: |
-          git fetch --all -p
-          git rev-parse --abbrev-ref HEAD
-          git pull --rebase
-          git log -1 --oneline
-          echo "After pull, listing data/:"
-          ls -lah data || true
