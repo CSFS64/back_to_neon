@@ -1,9 +1,9 @@
-name: Pull RSS → updates-all.json & updates.json
+name: Pull Zhihu to updates.json
 
 on:
   schedule:
-    - cron: "*/30 * * * *"   # 每 30 分钟跑一次（UTC）；按需调整频率
-  workflow_dispatch: {}       # 支持手动触发
+    - cron: "*/30 * * * *"
+  workflow_dispatch: {}
 
 jobs:
   build:
@@ -15,31 +15,42 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
+      - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: 20
 
-      # 如果没有 package.json，可以跳过安装依赖这步
-      - name: Install deps (optional)
-        run: npm ci || true
-
-      - name: Pull & Merge RSS to JSON
+      - name: Pull & Transform
         env:
-          RSS_URLS: ${{ secrets.RSS_URLS }} # 见下方“Secrets 格式”
+          RSS_URLS: ${{ secrets.RSS_URLS }}
+          MAX_ITEMS: "50000"
           EXCERPT_LEN: "180"
-          LATEST_KEEP: "50"                 # updates.json 保留条数（供 banner）
-          MAX_ITEMS: "50000"                # 全量库上限（updates-all.json）
-        run: node scripts/pull_updates.js
-
-      - name: Commit & Push if changed
+          LATEST_KEEP: "50"
         run: |
-          git config user.name  "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data/updates.json data/updates-all.json
-          if git diff --cached --quiet; then
-            echo "No changes"
-          else
-            git commit -m "chore: refresh updates-all.json & updates.json"
+          node -e "console.log('Node', process.version)"
+          node scripts/pull_updates.js
+
+      # —— 关键：打印结果，确认不是 [] —— 
+      - name: Show results
+        run: |
+          echo "--- updates-all.json (size bytes) ---"
+          wc -c data/updates-all.json || true
+          echo "--- head updates-all.json ---"
+          head -c 1200 data/updates-all.json || true
+          echo
+          echo "--- updates.json (size bytes) ---"
+          wc -c data/updates.json || true
+          echo "--- head updates.json ---"
+          head -c 1200 data/updates.json || true
+
+      - name: Commit changes
+        run: |
+          if [[ -n "$(git status --porcelain)" ]]; then
+            git config user.name  "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add data/updates.json data/updates-all.json
+            git commit -m "chore: refresh updates data"
             git push
+          else
+            echo "No changes"
           fi
