@@ -24,7 +24,7 @@ console.log(`[DEBUG] SOURCES count=${SOURCES.length}`);
 for (const s of SOURCES) {
   const safeUrl = (s.url || "").replace(/https?:\/\/([^\/]+)/i, (m, host) => `https://${host}`);
   console.log(`[DEBUG] src platform="${s.platform}" url="${safeUrl.slice(0,120)}"`);
-});
+};
 
 const MAX_ITEMS   = parseInt(process.env.MAX_ITEMS   || "50000", 10); // 全量库硬上限
 const EXCERPT_LEN = parseInt(process.env.EXCERPT_LEN || "180",   10);
