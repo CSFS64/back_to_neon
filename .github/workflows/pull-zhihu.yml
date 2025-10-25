@@ -9,14 +9,20 @@ jobs:
   build:
     runs-on: ubuntu-latest
     permissions:
-      contents: write   # ✅ 允许推送到当前仓库
+      contents: write
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          persist-credentials: true   # ✅ 用 GITHUB_TOKEN 推回本仓库
+          persist-credentials: true
           fetch-depth: 0
+          ref: ${{ github.ref_name }}   # ✅ 保证在当前分支
+
+      - name: Show branch & last commit
+        run: |
+          git rev-parse --abbrev-ref HEAD
+          git log -1 --oneline
 
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -30,26 +36,6 @@ jobs:
           echo "RSS_URLS length: ${#RSS_URLS}"
           echo "RSS_URLS head: ${RSS_URLS:0:200}"
 
-      - name: Check RSS_URLS lines (sanitized)
-        env:
-          RSS_URLS: ${{ secrets.RSS_URLS }}
-        run: |
-          echo "----- RAW COUNT -----"
-          echo "$RSS_URLS" | awk 'NF>0{c++} END{print "non-empty lines:", c+0}'
-          echo "----- SHOW PLATFORMS ONLY -----"
-          echo "$RSS_URLS" | sed -E 's#^([^ ]+) .*#\1#g' | sed -E 's#^https?://.*#(no platform)#g' | head -n 50
-
-      - name: Curl first 1-2 feeds (HEAD/GET)
-        env:
-          RSS_URLS: ${{ secrets.RSS_URLS }}
-        run: |
-          set -e
-          URL1=$(echo "$RSS_URLS" | sed -E 's#^[^ ]+ ##' | grep -E '^https?://' | head -n1)
-          [ -z "$URL1" ] && URL1=$(echo "$RSS_URLS" | head -n1)
-          echo "Test URL: $URL1"
-          curl -I -L --max-time 15 "$URL1" || true
-          curl -L --max-time 15 --range 0-1024 "$URL1" || true
-
       - name: Pull & Transform
         env:
           RSS_URLS: ${{ secrets.RSS_URLS }}
@@ -60,35 +46,55 @@ jobs:
           node -e "console.log('Node', process.version)"
           node scripts/pull_updates.js
 
-      - name: Show results
+      - name: Show results (workspace)
         run: |
-          echo "--- updates-all.json size ---"
-          wc -c data/updates-all.json || true
-          echo "--- head updates-all.json ---"
-          head -c 1200 data/updates-all.json || true
-          echo
-          echo "--- updates.json size ---"
-          wc -c data/updates.json || true
-          echo "--- head updates.json ---"
-          head -c 1200 data/updates.json || true
+          set -e
+          ls -lah data || true
+          for f in data/updates-all.json data/updates.json; do
+            if [ -f "$f" ]; then
+              echo "--- FILE: $f ---"
+              stat -c '%y %n' "$f" || true
+              sha256sum "$f" || true
+              head -c 300 "$f" || true
+              echo
+            else
+              echo "MISSING: $f"
+            fi
+          done
 
-      # ✅ 新增：把生成的文件提交回仓库（仅当有变化时）
       - name: Commit & Push changes
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           set -e
+          BRANCH="$(git rev-parse --abbrev-ref HEAD)"
+          echo "Current branch: $BRANCH"
+
           git config user.name  "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-          # 只把 data 下的结果文件加入
-          git add data/updates.json data/updates-all.json 2>/dev/null || true
+          # 避免非快进
+          git pull --rebase origin "$BRANCH" || true
 
-          # 如果没有变化就跳过提交
+          # 提交本次更新（将 data 下的两个文件加进去）
+          git add -A data
+
+          echo "---- staged diff ----"
+          git diff --staged --stat || true
+
           if git diff --staged --quiet; then
-            echo "No changes to commit."
+            echo "No changes to commit (likely identical content)."
             exit 0
           fi
 
-          git commit -m "chore: update RSS outputs (updates.json / updates-all.json)"
-          git push
+          git commit -m "chore: update RSS outputs (auto)"
+          git push origin "$BRANCH"
+
+      - name: Show repo file state after push (fetch)
+        run: |
+          git fetch --all -p
+          git rev-parse --abbrev-ref HEAD
+          git pull --rebase
+          git log -1 --oneline
+          echo "After pull, listing data/:"
+          ls -lah data || true
