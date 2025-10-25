@@ -81,100 +81,57 @@ function copyTemplate(btn){
   });
 }
 
-// ===== Kalyna Updates Loader (all/最新切换, clean titles, excerpt, cover, paging) =====
+// ===== Kalyna Updates Loader (clean titles, excerpt, cover, paging=3) =====
 (function () {
-  const PAGE_SIZE = 12; // 默认每页 12 条，更适合滚动
-  const qs = new URLSearchParams(location.search);
-  const wantAll = qs.get('all') === '1'; // ?all=1 使用全量
-  const DATA_URL_LATEST = () => 'data/updates.json?ts=' + Date.now();
-  const DATA_URL_ALL    = () => 'data/updates-all.json?ts=' + Date.now();
+  const DATA_URL = 'data/updates.json?ts=' + Date.now();
+  const PAGE_SIZE = 3; // ← 默认显示 3 条
 
-  // DOM
-  const elList   = document.getElementById('updatesList');
-  const elMore   = document.getElementById('updatesLoadMore');
-  const selPlat  = document.getElementById('filterPlatform');
-  const inpTag   = document.getElementById('filterTag');
+  const elList = document.getElementById('updatesList');
+  const elMore = document.getElementById('updatesLoadMore');
+  const selPlatform = document.getElementById('filterPlatform');
+  const inpTag = document.getElementById('filterTag');
   const btnApply = document.getElementById('filterApply');
   const btnReset = document.getElementById('filterReset');
-  const chkAll   = document.getElementById('filterAll'); // 可选：页面上勾选“全量”
-  const elCount  = document.getElementById('updatesCounter'); // 可选：显示计数
 
   if (!elList) return;
 
-  // 状态
   let allUpdates = [];
   let filtered = [];
   let page = 1;
-  let usingAll = wantAll || (chkAll && chkAll.checked);
 
-  // 事件
-  btnApply && btnApply.addEventListener('click', applyFilter);
-  btnReset && btnReset.addEventListener('click', () => {
-    if (selPlat) selPlat.value = '';
-    if (inpTag)  inpTag.value = '';
-    if (chkAll)  chkAll.checked = false;
-    usingAll = wantAll; // 也还原回 URL 指定
-    page = 1;
-    loadData();
-  });
-  elMore && elMore.addEventListener('click', () => { page++; render(); });
-  chkAll && chkAll.addEventListener('change', () => {
-    usingAll = !!chkAll.checked;
-    page = 1;
-    loadData();
-    // 同步地址栏但不跳转
-    try {
-      const u = new URL(location.href);
-      if (usingAll) u.searchParams.set('all', '1'); else u.searchParams.delete('all');
-      history.replaceState(null, '', u.toString());
-    } catch {}
-  });
-
-  // 初始载入
-  loadData();
-
-  /* ---------------- core ---------------- */
-  function dataURL() {
-    return usingAll ? DATA_URL_ALL() : DATA_URL_LATEST();
-  }
-
-  function loadData() {
-    elList.innerHTML = `<div class="loading">载入中…</div>`;
-    fetch(dataURL(), { cache: 'no-store' })
-      .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
-      .then(json => {
-        if (!Array.isArray(json)) throw new Error('数据不是数组');
-        // 统一清洗并排序（后端已处理，这里再兜底一次）
-        allUpdates = json.slice().map(normalizeItem)
-          .sort((a, b) => (b.date || '').localeCompare(a.date || '') || (b.title||'').localeCompare(a.title||''));
-        buildPlatformOptions(allUpdates);
-        page = 1;
-        applyFilter();
-      })
-      .catch(err => {
-        elList.innerHTML = `<div class="warning-box"><b>加载失败：</b>${esc(err.message || err)}</div>`;
-        if (elMore) elMore.hidden = true;
-      });
-  }
+  fetch(DATA_URL, { cache: 'no-store' })
+    .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+    .then(json => {
+      if (!Array.isArray(json)) throw new Error('updates.json 不是数组');
+      allUpdates = json.slice().sort((a, b) => (b.date || '').localeCompare(a.date || ''));
+      applyFilter();
+      btnApply && btnApply.addEventListener('click', applyFilter);
+      btnReset && btnReset.addEventListener('click', () => { if (selPlatform) selPlatform.value = ''; if (inpTag) inpTag.value = ''; applyFilter(); });
+      elMore && elMore.addEventListener('click', () => { page++; render(); });
+    })
+    .catch(err => {
+      elList.innerHTML = `<div class="warning-box"><b>加载失败：</b>${String(err.message || err)}</div>`;
+    });
 
   function applyFilter() {
-    const plat = (selPlat && selPlat.value || '').trim();
-    const qRaw = (inpTag && inpTag.value || '').trim().toLowerCase();
-    const terms = qRaw ? qRaw.split(/\s+/).filter(Boolean) : [];
-
+    const plat = (selPlatform && selPlatform.value || '').trim();
+    const q = (inpTag && inpTag.value || '').trim().toLowerCase();
+  
     filtered = allUpdates.filter(it => {
+      // 平台筛选（保持不变）
       if (plat && String(it.platform) !== plat) return false;
-      if (!terms.length) return true;
+      // 关键词：搜 title / excerpt / tags
+      if (!q) return true;
       const hay = [
         it.title || '',
         it.excerpt || '',
         ...(Array.isArray(it.tags) ? it.tags : [])
       ].join(' ').toLowerCase();
-      // 所有词都命中
-      return terms.every(w => hay.includes(w));
+  
+      // 支持多词：输入 "drone Avdiivka" 时，两个词都要命中
+      return q.split(/\s+/).every(w => w && hay.includes(w));
     });
-
-    // 重新分页&渲染
+  
     page = 1;
     render();
   }
@@ -182,115 +139,67 @@ function copyTemplate(btn){
   function render() {
     const end = PAGE_SIZE * page;
     const slice = filtered.slice(0, end);
+    const byId = new Map(allUpdates.map(it => [it.id, it]));
 
-    // 为空时提示
     if (slice.length === 0) {
       elList.innerHTML = `<div class="warning-box"><b>无结果：</b>请清空筛选后再试。</div>`;
       if (elMore) elMore.hidden = true;
-      if (elCount) elCount.textContent = `0 / ${filtered.length}`;
       return;
     }
 
-    // 计算“上一篇/下一篇”：基于当前 filtered 的顺序
-    for (let i = 0; i < filtered.length; i++) {
-      const it = filtered[i];
-      it.__prevId = i > 0 ? filtered[i - 1].id : '';
-      it.__nextId = i < filtered.length - 1 ? filtered[i + 1].id : '';
-    }
-    const byId = new Map(filtered.map(x => [x.id, x]));
-
     elList.innerHTML = slice.map(it => cardHTML(it, byId)).join('');
     if (elMore) elMore.hidden = filtered.length <= end;
-    if (elCount) elCount.textContent = `${Math.min(end, filtered.length)} / ${filtered.length}`;
   }
 
-  /* ---------------- utils ---------------- */
   const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-  function decodeEntities(s){ const ta = document.createElement('textarea'); ta.innerHTML = String(s ?? ''); return ta.value; }
+  function decodeEntities(s){
+    const ta = document.createElement('textarea'); ta.innerHTML = String(s ?? ''); return ta.value;
+  }
   function stripTags(s){ return String(s ?? '').replace(/<[^>]*>/g, ' ').replace(/\s+/g,' ').trim(); }
   function clampText(s, n){ s = String(s ?? ''); return s.length > n ? s.slice(0, n-1) + '…' : s; }
 
-  // 标准化一条记录（防御空字段）
-  function normalizeItem(it) {
-    const title = safeTitle(it);
-    const excerpt = safeExcerpt(it);
-    const date = (it.date || '').slice(0,10);
-    const platform = it.platform || '';
-    const url = it.url || '';
-    const image = it.image || '';
-
-    return {
-      ...it,
-      id: String(it.id || url || title || Math.random().toString(36).slice(2)),
-      title, excerpt, date, platform, url, image,
-      tags: Array.isArray(it.tags) ? it.tags : []
-    };
-  }
-
   function safeTitle(it){
     const t = (it.title && String(it.title).trim()) || '';
-    if (t) return clampText(t, 120);
+    if (t) return t;
     const body = stripTags(decodeEntities(it.excerpt || it.description || ''));
-    return clampText(body, 60);
+    return clampText(body, 36);
   }
 
   function safeExcerpt(it){
     const text = stripTags(decodeEntities(it.excerpt || it.description || ''));
-    return clampText(text, 240);
+    return clampText(text, 220);
   }
 
   function coverURL(it){
     return it.image ? String(it.image) : '';
   }
 
-  // 动态填充平台下拉（首项为空=全部）
-  function buildPlatformOptions(items) {
-    if (!selPlat) return;
-    const cur = selPlat.value;
-    const set = new Set(items.map(x => x.platform).filter(Boolean));
-    const opts = ['<option value="">全部平台</option>']
-      .concat([...set].sort().map(p => `<option value="${esc(p)}">${esc(p)}</option>`));
-    selPlat.innerHTML = opts.join('');
-    // 保留用户原选择
-    if ([...set].includes(cur)) selPlat.value = cur;
-  }
-
   function cardHTML(it, byId){
-    const title = it.title;
-    const excerpt = it.excerpt;
+    const title = safeTitle(it);
+    const excerpt = safeExcerpt(it);
     const cover = coverURL(it);
 
-    const prev = it.__prevId && byId.get(it.__prevId);
-    const next = it.__nextId && byId.get(it.__nextId);
+    const prev = it.prev && byId.get(it.prev);
+    const next = it.next && byId.get(it.next);
+    const related = Array.isArray(it.related) ? it.related.map(id => byId.get(id)).filter(Boolean) : [];
 
     const prevLink = prev ? `<a href="#updates" data-jump="${esc(prev.id)}" class="inline-link">上一篇</a>` : '';
     const nextLink = next ? `<a href="#updates" data-jump="${esc(next.id)}" class="inline-link">下一篇</a>` : '';
-
-    // 相关：基于同平台同天可做个简单推荐（可选）
-    const related = [];
-    if (it.date && it.platform) {
-      const sameDay = filtered.filter(x => x.id !== it.id && x.platform === it.platform && x.date === it.date).slice(0, 3);
-      for (const r of sameDay) related.push(r);
-    }
-    const relatedLinks = related.length ? related
-      .map(r => `<a href="#updates" data-jump="${esc(r.id)}" class="inline-link">${esc(safeTitle(r))}</a>`)
-      .join('、') : '';
+    const relatedLinks = related.length ? related.map(r => `<a href="#updates" data-jump="${esc(r.id)}" class="inline-link">${esc(safeTitle(r))}</a>`).join('、') : '';
 
     return `
       <article class="update-card" role="listitem" itemscope itemtype="https://schema.org/Article" id="${esc(it.id)}">
-        ${cover ? `<img class="update-cover" loading="lazy" src="${esc(cover)}" alt="${esc(title)} 封面" />` : ''}
+        ${cover ? `<img class="update-cover" loading="lazy" src="${esc(cover)}" alt="${esc(title)} 封面">` : ''}
         <div class="update-body">
           <h3 class="update-title">
-            ${it.url ? `<a class="inline-link" href="${esc(it.url)}" target="_blank" rel="noopener" itemprop="headline">${esc(title)}</a>`
-                     : `<span itemprop="headline">${esc(title)}</span>`}
+            <a class="inline-link" href="${esc(it.url)}" target="_blank" rel="noopener" itemprop="headline">${esc(title)}</a>
           </h3>
           <div class="update-meta">
-            ${it.date ? `<span><b>DATE:</b> ${esc(it.date)}</span>` : ''}${it.date && it.platform ? ' • ' : ''}
-            ${it.platform ? `<span><b>PLATFORM:</b> ${esc(it.platform)}</span>` : ''}
+            ${it.date ? `<span><b>DATE:</b> ${esc(it.date)}</span>` : ''} ${it.platform ? ` • <span><b>PLATFORM:</b> ${esc(it.platform)}</span>` : ''}
           </div>
           ${excerpt ? `<p class="update-excerpt" itemprop="description">${esc(excerpt)}</p>` : ''}
           <div class="update-links">
-            ${it.url ? `<a class="inline-link" href="${esc(it.url)}" target="_blank" rel="noopener">阅读原文 ↗</a>` : ''}
+            <a class="inline-link" href="${esc(it.url)}" target="_blank" rel="noopener">阅读原文 ↗</a>
             ${prevLink} ${nextLink}
             ${relatedLinks ? `<span style="opacity:.6">| 相关：</span> ${relatedLinks}` : ''}
           </div>
