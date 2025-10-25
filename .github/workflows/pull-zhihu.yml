@@ -20,6 +20,14 @@ jobs:
         with:
           node-version: 20
 
+      - name: Echo RSS_URLS length (debug)
+        env:
+          RSS_URLS: ${{ secrets.RSS_URLS }}
+        run: |
+          echo "RSS_URLS length: ${#RSS_URLS}"
+          # 打印前 200 字看是否为空（会被 GitHub 自动打码特殊字符，不含敏感）
+          echo "RSS_URLS head: ${RSS_URLS:0:200}"
+
       - name: Pull & Transform
         env:
           RSS_URLS: ${{ secrets.RSS_URLS }}
@@ -30,27 +38,14 @@ jobs:
           node -e "console.log('Node', process.version)"
           node scripts/pull_updates.js
 
-      # —— 关键：打印结果，确认不是 [] —— 
       - name: Show results
         run: |
-          echo "--- updates-all.json (size bytes) ---"
+          echo "--- updates-all.json size ---"
           wc -c data/updates-all.json || true
           echo "--- head updates-all.json ---"
           head -c 1200 data/updates-all.json || true
           echo
-          echo "--- updates.json (size bytes) ---"
+          echo "--- updates.json size ---"
           wc -c data/updates.json || true
           echo "--- head updates.json ---"
           head -c 1200 data/updates.json || true
-
-      - name: Commit changes
-        run: |
-          if [[ -n "$(git status --porcelain)" ]]; then
-            git config user.name  "github-actions[bot]"
-            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-            git add data/updates.json data/updates-all.json
-            git commit -m "chore: refresh updates data"
-            git push
-          else
-            echo "No changes"
-          fi
