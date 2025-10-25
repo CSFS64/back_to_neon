@@ -9,11 +9,14 @@ jobs:
   build:
     runs-on: ubuntu-latest
     permissions:
-      contents: write
+      contents: write   # ✅ 允许推送到当前仓库
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          persist-credentials: true   # ✅ 用 GITHUB_TOKEN 推回本仓库
+          fetch-depth: 0
 
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -25,10 +28,8 @@ jobs:
           RSS_URLS: ${{ secrets.RSS_URLS }}
         run: |
           echo "RSS_URLS length: ${#RSS_URLS}"
-          # 打印前 200 字（GitHub 会自动打码敏感片段）
           echo "RSS_URLS head: ${RSS_URLS:0:200}"
 
-      # 新增：快速检查行数与平台列
       - name: Check RSS_URLS lines (sanitized)
         env:
           RSS_URLS: ${{ secrets.RSS_URLS }}
@@ -38,7 +39,6 @@ jobs:
           echo "----- SHOW PLATFORMS ONLY -----"
           echo "$RSS_URLS" | sed -E 's#^([^ ]+) .*#\1#g' | sed -E 's#^https?://.*#(no platform)#g' | head -n 50
 
-      # 新增：cURL 验证第一个 URL 的可达性（HEAD+部分 GET）
       - name: Curl first 1-2 feeds (HEAD/GET)
         env:
           RSS_URLS: ${{ secrets.RSS_URLS }}
@@ -71,3 +71,24 @@ jobs:
           wc -c data/updates.json || true
           echo "--- head updates.json ---"
           head -c 1200 data/updates.json || true
+
+      # ✅ 新增：把生成的文件提交回仓库（仅当有变化时）
+      - name: Commit & Push changes
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -e
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          # 只把 data 下的结果文件加入
+          git add data/updates.json data/updates-all.json 2>/dev/null || true
+
+          # 如果没有变化就跳过提交
+          if git diff --staged --quiet; then
+            echo "No changes to commit."
+            exit 0
+          fi
+
+          git commit -m "chore: update RSS outputs (updates.json / updates-all.json)"
+          git push
