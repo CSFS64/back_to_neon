@@ -25,8 +25,30 @@ jobs:
           RSS_URLS: ${{ secrets.RSS_URLS }}
         run: |
           echo "RSS_URLS length: ${#RSS_URLS}"
-          # 打印前 200 字看是否为空（会被 GitHub 自动打码特殊字符，不含敏感）
+          # 打印前 200 字（GitHub 会自动打码敏感片段）
           echo "RSS_URLS head: ${RSS_URLS:0:200}"
+
+      # 新增：快速检查行数与平台列
+      - name: Check RSS_URLS lines (sanitized)
+        env:
+          RSS_URLS: ${{ secrets.RSS_URLS }}
+        run: |
+          echo "----- RAW COUNT -----"
+          echo "$RSS_URLS" | awk 'NF>0{c++} END{print "non-empty lines:", c+0}'
+          echo "----- SHOW PLATFORMS ONLY -----"
+          echo "$RSS_URLS" | sed -E 's#^([^ ]+) .*#\1#g' | sed -E 's#^https?://.*#(no platform)#g' | head -n 50
+
+      # 新增：cURL 验证第一个 URL 的可达性（HEAD+部分 GET）
+      - name: Curl first 1-2 feeds (HEAD/GET)
+        env:
+          RSS_URLS: ${{ secrets.RSS_URLS }}
+        run: |
+          set -e
+          URL1=$(echo "$RSS_URLS" | sed -E 's#^[^ ]+ ##' | grep -E '^https?://' | head -n1)
+          [ -z "$URL1" ] && URL1=$(echo "$RSS_URLS" | head -n1)
+          echo "Test URL: $URL1"
+          curl -I -L --max-time 15 "$URL1" || true
+          curl -L --max-time 15 --range 0-1024 "$URL1" || true
 
       - name: Pull & Transform
         env:
