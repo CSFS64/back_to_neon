@@ -2,67 +2,40 @@ name: Pull Zhihu to updates.json
 
 on:
   schedule:
-    - cron: "*/30 * * * *"
-  workflow_dispatch: {}
+    - cron: "*/30 * * * *"   # 每 30 分钟跑一次（UTC）
+  workflow_dispatch: {}       # 手动触发按钮
 
 jobs:
   build:
     runs-on: ubuntu-latest
     permissions:
-      contents: write
-
+      contents: write    # 允许推送回仓库
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          persist-credentials: true
-          fetch-depth: 0
-          ref: ${{ github.ref_name }}
 
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: 20
 
-      - name: Pull & Transform (merge history)
+      - name: Pull & Transform
         env:
-          RSS_URLS:    ${{ secrets.RSS_URLS }}
-          MAX_ARCHIVE: "50000"
-          MAX_ITEMS:   "120"
+          RSS_URLS: ${{ secrets.RSS_URLS }}
+          MAX_ITEMS: "150"       # 可按需调整
           EXCERPT_LEN: "180"
-          HISTORY_SHARD: "1"
         run: |
-          node -e "console.log('Node', process.version)"
+          node -e "console.log('Node version', process.version)"
           node scripts/pull_updates.js
 
-      - name: Show outputs
+      - name: Commit changes
         run: |
-          ls -lah data || true
-          echo "---- updates-all head ----"
-          head -c 800 data/updates-all.json || true
-          echo
-          echo "---- updates head ----"
-          head -c 800 data/updates.json || true
-          echo
-          echo "---- history recent ----"
-          ls -lah data/history/* 2>/dev/null | tail -n 20 || true
-
-      - name: Commit & Push changes (all data/)
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          set -e
-          git config user.name  "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          BRANCH="$(git rev-parse --abbrev-ref HEAD)"
-          git pull --rebase origin "$BRANCH" || true
-
-          git add data/updates.json data/updates-all.json data/history || true
-
-          if git diff --staged --quiet; then
-            echo "No changes to commit."
-            exit 0
+          if [[ -n "$(git status --porcelain)" ]]; then
+            git config user.name  "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add data/updates.json
+            git commit -m "chore: refresh updates.json from RSS"
+            git push
+          else
+            echo "No changes"
           fi
-
-          git commit -m "chore: merge RSS updates into history (updates-all, updates, history shards)"
-          git push origin "$BRANCH"
