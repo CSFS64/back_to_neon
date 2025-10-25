@@ -28,6 +28,27 @@ jobs:
           node -e "console.log('Node version', process.version)"
           node scripts/pull_updates.js
 
+      - name: Accumulate into updates-all.json
+        run: |
+          node scripts/accumulate_updates.js
+          echo "--- head updates-all.json ---"
+          head -c 1200 data/updates-all.json || true
+
+      - name: Commit changes
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -e
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/updates.json data/updates-all.json
+          if git diff --staged --quiet; then
+            echo "No changes"
+            exit 0
+          fi
+          git commit -m "chore: accumulate updates into updates-all.json"
+          git push
+
       - name: Commit changes
         run: |
           if [[ -n "$(git status --porcelain)" ]]; then
