@@ -6,11 +6,11 @@
 import fs from "node:fs/promises";
 
 /* ------------------------ 读取与解析源列表 ------------------------ */
-// 允许以下两种写法混用：
+// 支持：
 //   Zhihu https://rsshub.app/zhihu/people/pins/xxx
 //   https://rsshub.app/zhihu/people/activities/xxx
 const RAW = process.env.RSS_URLS || "";
-const LINES = RAW.split(/\n|,/).map(s => s.trim()).filter(Boolean);
+const LINES = RAW.split(/\r?\n|,/).map(s => s.trim()).filter(Boolean);
 if (!LINES.length) {
   console.error("ERROR: 环境变量 RSS_URLS 为空。请在 GitHub Secrets 里设置。");
   process.exit(1);
@@ -20,13 +20,13 @@ const SOURCES = LINES.map(line => {
   return m ? { platform: m[1], url: m[2] } : { platform: "", url: line };
 });
 
-const MAX_ITEMS    = parseInt(process.env.MAX_ITEMS    || "50000", 10); // 全量库硬上限
-const EXCERPT_LEN  = parseInt(process.env.EXCERPT_LEN  || "180",   10);
-const LATEST_KEEP  = parseInt(process.env.LATEST_KEEP  || "50",    10);
+const MAX_ITEMS   = parseInt(process.env.MAX_ITEMS   || "50000", 10); // 全量库硬上限
+const EXCERPT_LEN = parseInt(process.env.EXCERPT_LEN || "180",   10);
+const LATEST_KEEP = parseInt(process.env.LATEST_KEEP || "50",    10);
 
-const OUT_DIR      = "data";
-const OUT_ALL      = `${OUT_DIR}/updates-all.json`; // 全量
-const OUT_LATEST   = `${OUT_DIR}/updates.json`;     // 最新 N 条（供 banner 等轻载）
+const OUT_DIR    = "data";
+const OUT_ALL    = `${OUT_DIR}/updates-all.json`; // 全量
+const OUT_LATEST = `${OUT_DIR}/updates.json`;     // 最新 N 条（供 banner 等轻载）
 
 /* ------------------------ 主流程：抓取 → 解析 → 合并历史 ------------------------ */
 const fresh = [];
@@ -35,12 +35,13 @@ for (const src of SOURCES) {
   const hint = src.platform || platformFromURL(url); // 平台名优先取行首指定；否则按域名猜
   try {
     const xml    = await fetchText(url);
-    const items  = parseRSS(xml);
+    console.log(`[DEBUG] sniff=`, /<feed[\s>]/i.test(xml) ? 'Atom' : 'RSS', ' len=', xml.length, ' url=', url);
+    const items  = parseFeed(xml);        // ← 兼容 RSS/Atom
     const mapped = items.map(it => mapToUnified(it, { platformHint: hint, excerptLen: EXCERPT_LEN }));
     fresh.push(...mapped);
     console.log(`[RSS] ${hint} ${url} -> ${items.length} items`);
   } catch (e) {
-    console.error(`WARN: 抓取失败 ${url}:`, String(e).slice(0, 200));
+    console.error(`WARN: 抓取失败 ${url}:`, String(e).slice(0, 300));
   }
 }
 
@@ -53,11 +54,23 @@ try {
   if (!Array.isArray(old)) old = [];
 } catch { old = []; }
 
+// 若本次抓取为 0 条且已有历史 → 不覆盖，直接退出（防止把文件清空成 []）
+if (fresh.length === 0 && old.length > 0) {
+  console.warn("[WARN] 本次抓取 0 条，保留历史文件不覆盖。");
+  process.exit(0);
+}
+
 const merged = dedupeByKey([...fresh, ...old], x => x.id || x.url || x.title);
 merged.sort((a, b) => (b.date || "").localeCompare(a.date || ""));
 
 const trimmedAll = merged.slice(0, MAX_ITEMS);
 const latest     = merged.slice(0, LATEST_KEEP);
+
+// 如果 merged 还是空（首次跑且抓不到），也不要写空文件
+if (trimmedAll.length === 0) {
+  console.error("[ERROR] 抓取与历史均为空，取消写入。请检查 RSS_URLS 或源可用性。");
+  process.exit(2);
+}
 
 // 写文件
 await fs.writeFile(OUT_ALL,    JSON.stringify(trimmedAll, null, 2), "utf8");
@@ -71,22 +84,57 @@ async function fetchText(url) {
   return await res.text();
 }
 
-// 极简 RSS 解析（足以应对 RSSHub 常见字段）
-function parseRSS(xml) {
-  const blocks = xml.split(/<item>/).slice(1).map(b => "<item>" + b);
-  return blocks.map(it => ({
-    title:       pick(it, /<title><!\[CDATA\[(.*?)\]\]><\/title>|<title>(.*?)<\/title>/s),
-    link:        pick(it, /<link>(.*?)<\/link>/s),
-    guid:        pick(it, /<guid[^>]*>(.*?)<\/guid>/s),
-    pubDate:     pick(it, /<pubDate>(.*?)<\/pubDate>/s),
-    description: pick(it, /<description><!\[CDATA\[(.*?)\]\]><\/description>|<description>(.*?)<\/description>/s),
-    content:     pick(it, /<content:encoded><!\[CDATA\[(.*?)\]\]><\/content:encoded>/s),
-    summary:     pick(it, /<summary><!\[CDATA\[(.*?)\]\]><\/summary>|<summary>(.*?)<\/summary>/s)
-  }));
+// —— 解析 RSS（<rss><item>）或 Atom（<feed><entry>）——
+function parseFeed(xml) {
+  const isAtom = /<feed[\s>]/i.test(xml) && /<entry[\s>]/i.test(xml);
+  if (!isAtom) {
+    // RSS 2.0：更稳健的 <item> 匹配
+    const blocks = xml.split(/<item\b[^>]*>/i).slice(1).map(b => "<item>" + b);
+    return blocks.map(it => ({
+      title:       pick(it, /<title(?:>|\s[^>]*>)(?:<!\[CDATA\[(.*?)\]\]>|([^<]*))<\/title>/is),
+      link:        pick(it, /<link(?:>|\s[^>]*>)([^<]+)<\/link>/is),
+      guid:        pick(it, /<guid[^>]*>([^<]+)<\/guid>/is),
+      pubDate:     pick(it, /<pubDate>([^<]+)<\/pubDate>/is),
+      description: pick(it, /<description(?:>|\s[^>]*>)(?:<!\[CDATA\[(.*?)\]\]>|([^<]*))<\/description>/is),
+      content:     pick(it, /<content:encoded(?:>|\s[^>]*>)(?:<!\[CDATA\[(.*?)\]\]>|([\s\S]*?))<\/content:encoded>/is),
+      summary:     pick(it, /<summary(?:>|\s[^>]*>)(?:<!\[CDATA\[(.*?)\]\]>|([^<]*))<\/summary>/is)
+    }));
+  } else {
+    // Atom 1.0
+    const blocks = xml.split(/<entry\b[^>]*>/i).slice(1).map(b => "<entry>" + b);
+    return blocks.map(en => {
+      // <link href="..."> 或 <link rel="alternate" href="...">
+      const link =
+        pickAttr(en, /<link\b[^>]*rel=["']alternate["'][^>]*>/i, 'href') ||
+        pickAttr(en, /<link\b[^>]*>/i, 'href') ||
+        "";
+
+      return {
+        title:       pick(en, /<title(?:>|\s[^>]*>)(?:<!\[CDATA\[(.*?)\]\]>|([\s\S]*?))<\/title>/is),
+        link,
+        guid:        pick(en, /<id>([^<]+)<\/id>/i) || link,
+        pubDate:     pick(en, /<updated>([^<]+)<\/updated>/i) || pick(en, /<published>([^<]+)<\/published>/i),
+        description: pick(en, /<summary(?:>|\s[^>]*>)(?:<!\[CDATA\[(.*?)\]\]>|([^<]*))<\/summary>/is),
+        content:     pick(en, /<content(?:>|\s[^>]*>)(?:<!\[CDATA\[(.*?)\]\]>|([\s\S]*?))<\/content>/is),
+        summary:     ""
+      };
+    });
+  }
 }
+
+// 取文本（支持两组捕获）
 function pick(s, re) {
   const m = s.match(re);
   return (m && (m[1] || m[2])) ? (m[1] || m[2]).trim() : "";
+}
+
+// 从单个标签里取属性（如 <link href="...">）
+function pickAttr(s, tagRe, attr) {
+  const m = s.match(tagRe);
+  if (!m) return "";
+  const tag = m[0];
+  const m2 = tag.match(new RegExp(attr + `=["']([^"']+)["']`, 'i'));
+  return m2 ? m2[1].trim() : "";
 }
 
 // HTML 实体反转（足够应对常见实体）
