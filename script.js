@@ -83,7 +83,7 @@ function copyTemplate(btn){
 
 // ===== Kalyna Updates Loader (clean titles, excerpt, cover, paging=3) =====
 (function () {
-  const DATA_URL = 'data/updates.json?ts=' + Date.now();
+  const DATA_URL = 'data/updates-all.json?ts=' + Date.now();
   const PAGE_SIZE = 3; // ← 默认显示 3 条
 
   const elList = document.getElementById('updatesList');
