@@ -21,6 +21,8 @@
     .toolbar button.primary{background:var(--acc);color:#00223a;border-color:#59c9ff;font-weight:700}
     .toolbar button:disabled{opacity:.6;cursor:not-allowed}
     .cards{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+    /* ★ 拖拽中切换为单列，消除多列网格导致的 DOM/视觉错位 */
+    .cards.sorting{grid-template-columns:1fr !important;}
     @media (max-width:980px){.cards{grid-template-columns:repeat(2,1fr)}}
     @media (max-width:680px){.cards{grid-template-columns:1fr}}
     .card{background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden;display:flex;flex-direction:column;min-height:140px}
@@ -176,16 +178,28 @@
     function onDragStart(e){
       const card = e.target.closest('.card');
       dragId = card?.dataset.id || null;
-      e.dataTransfer?.setData('text/plain', dragId);
-      e.dataTransfer?.setDragImage(card, 20, 20);
+
+      if (e.dataTransfer) {
+        e.dataTransfer.setData('text/plain', dragId);
+        e.dataTransfer.effectAllowed = 'move'; // ★ 明确移动效果
+        e.dataTransfer.dropEffect = 'move';
+        e.dataTransfer.setDragImage(card, 20, 20);
+      }
+
       requestAnimationFrame(()=> card.classList.add('ghost'));
-      $('#grid').addEventListener('dragover', onDragOver);
-      $('#grid').addEventListener('drop', onDrop);
+
+      // ★ 拖拽时切换为单列，确保 Y 轴插入逻辑正确
+      const grid = $('#grid');
+      grid.classList.add('sorting');
+      grid.addEventListener('dragover', onDragOver);
+      grid.addEventListener('drop', onDrop);
     }
-    function onDragEnd(e){
+    function onDragEnd(){
       $$('.card.ghost').forEach(n=>n.classList.remove('ghost'));
-      $('#grid').removeEventListener('dragover', onDragOver);
-      $('#grid').removeEventListener('drop', onDrop);
+      const grid = $('#grid');
+      grid.classList.remove('sorting'); // ★ 恢复为多列
+      grid.removeEventListener('dragover', onDragOver);
+      grid.removeEventListener('drop', onDrop);
     }
     function onDragOver(e){
       e.preventDefault();
