@@ -245,7 +245,7 @@
     // ------- Toolbar actions -------
     $('#btnLoad').addEventListener('click', async ()=>{
       try{
-        const url = 'data/updates-all.json?ts=' + Date.now();
+        const url = '../data/updates-all.json?ts=' + Date.now();
         const res = await fetch(url,{cache:'no-store'});
         if (!res.ok) throw new Error('HTTP '+res.status);
         const json = await res.json();
