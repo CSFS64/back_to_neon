@@ -21,7 +21,7 @@
     .toolbar button.primary{background:var(--acc);color:#00223a;border-color:#59c9ff;font-weight:700}
     .toolbar button:disabled{opacity:.6;cursor:not-allowed}
     .cards{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
-    /* ★ 拖拽中切换为单列，消除多列网格导致的 DOM/视觉错位 */
+    /* 拖拽中切单列，避免网格多列导致视觉/DOM 顺序错位 */
     .cards.sorting{grid-template-columns:1fr !important;}
     @media (max-width:980px){.cards{grid-template-columns:repeat(2,1fr)}}
     @media (max-width:680px){.cards{grid-template-columns:1fr}}
@@ -142,7 +142,7 @@
         card.className = 'card' + (it.pinned ? ' pinned':'' );
         card.dataset.id = it.id;
 
-        // Drag handle
+        // Drag handle（只在“≡”上拖动）
         const handle = document.createElement('div');
         handle.className = 'drag-handle';
         handle.draggable = true;
@@ -174,59 +174,67 @@
     }
 
     // ------- Drag & Drop -------
-    let dragId = null;
+    let dragEl = null; // 直接保存“被拖拽的卡片节点”（避免 querySelector 误差）
+
     function onDragStart(e){
       const card = e.target.closest('.card');
-      dragId = card?.dataset.id || null;
+      dragEl = card || null;
 
       if (e.dataTransfer) {
-        e.dataTransfer.setData('text/plain', dragId);
-        e.dataTransfer.effectAllowed = 'move'; // ★ 明确移动效果
+        e.dataTransfer.setData('text/plain', card?.dataset.id || '');
+        e.dataTransfer.effectAllowed = 'move';
         e.dataTransfer.dropEffect = 'move';
         e.dataTransfer.setDragImage(card, 20, 20);
       }
 
+      // 视觉“半透明”
       requestAnimationFrame(()=> card.classList.add('ghost'));
 
-      // ★ 拖拽时切换为单列，确保 Y 轴插入逻辑正确
+      // 拖拽时把网格切换成单列，确保 Y 轴插入逻辑正确
       const grid = $('#grid');
       grid.classList.add('sorting');
       grid.addEventListener('dragover', onDragOver);
       grid.addEventListener('drop', onDrop);
     }
+
     function onDragEnd(){
-      $$('.card.ghost').forEach(n=>n.classList.remove('ghost'));
+      if (dragEl) dragEl.classList.remove('ghost');
       const grid = $('#grid');
-      grid.classList.remove('sorting'); // ★ 恢复为多列
+      grid.classList.remove('sorting');
       grid.removeEventListener('dragover', onDragOver);
       grid.removeEventListener('drop', onDrop);
+      dragEl = null;
     }
+
     function onDragOver(e){
       e.preventDefault();
       const grid = $('#grid');
-      const after = getDragAfterElement(grid, e.clientY);
-      const dragging = $(`.card[data-id="${CSS.escape(dragId)}"]`);
-      if (!dragging) return;
-      if (after == null) grid.appendChild(dragging); else grid.insertBefore(dragging, after);
+      if (!dragEl) return;
+      const after = getDragAfterElement(grid, e.clientY, dragEl);
+      if (after == null) grid.appendChild(dragEl); else grid.insertBefore(dragEl, after);
     }
-    function getDragAfterElement(container, y){
-      const els = [...container.querySelectorAll('.card:not(.ghost)')];
+
+    // 计算“鼠标 Y 之下的第一个卡片”（排除自身）
+    function getDragAfterElement(container, y, exclude){
+      const els = [...container.querySelectorAll('.card')].filter(el => el !== exclude);
       return els.find(el => {
         const rect = el.getBoundingClientRect();
         return y < rect.top + rect.height / 2;
       }) || null;
     }
+
     function onDrop(e){
       e.preventDefault();
       // 根据当前 DOM 顺序更新 view 与 all 的 rank
       const ids = $$('.card').map(n=>n.dataset.id);
       const index = new Map(ids.map((id,i)=>[id,i]));
       view.sort((a,b)=> index.get(a.id) - index.get(b.id));
+
       // 把 view 的顺序同步回 all（仅改变 rank）
-      // 规则：当前视图顺序 -> rank: 1..N，未在视图中的项 rank 不动
       let r = 1;
       const present = new Set(ids);
       for (const it of all){ if (present.has(it.id)) it.rank = r++; }
+
       applyFilter();
     }
 
@@ -305,23 +313,19 @@
     });
 
     $('#btnExport').addEventListener('click', ()=>{
-      // 导出策略：
-      // 1) 依据当前筛选后的可见顺序，为这些项设置 rank=1..N；未可见的项保留原 rank
+      // 1) 依据当前可见顺序 -> rank
       const ids = $$('.card').map(n=>n.dataset.id);
       let r = 1; const set = new Set(ids);
       for (const it of all){ if (set.has(it.id)) it.rank = r++; }
-
-      // 2) 按手动规则整体排序，确保导出的顺序 = 你看到的顺序
+      // 2) 整体排序，输出即所见
       const exporting = sortWithManual(all.slice());
-
-      // 3) 触发下载
+      // 3) 下载
       const blob = new Blob([JSON.stringify(exporting, null, 2)], {type:'application/json'});
       const a = document.createElement('a');
       a.href = URL.createObjectURL(blob);
       a.download = 'updates-all.json';
       a.click();
       URL.revokeObjectURL(a.href);
-
       $('#status').textContent = '已导出 updates-all.json（请提交到仓库覆盖原文件）';
     });
 
