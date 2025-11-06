@@ -223,7 +223,6 @@ function copyTemplate(btn){
   });
 })();
 
-<script>
 ;(() => {
   const wrap   = document.getElementById('mapPreview');
   const panel  = document.getElementById('mapPreviewPanel');
@@ -326,4 +325,3 @@ function copyTemplate(btn){
   // 首屏自动打开 1.5s，再自动收起
   requestAnimationFrame(() => openPreview({ auto: true }));
 })();
-</script>
