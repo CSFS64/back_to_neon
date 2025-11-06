@@ -6,6 +6,15 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <title>Kalyna OSINT — 导航终端与招募</title>
   <link rel="stylesheet" href="styles.css?v=30">
+  <script>
+  // 允许用 ?autoShow=1 或 ?trench=on 来让预览自动打开 trench
+  (function(){
+    const q = new URLSearchParams(location.search);
+    if (q.get('autoShow') === '1' || q.get('trench') === 'on') {
+      window.TrenchConfig = Object.assign({}, window.TrenchConfig || {}, { autoShow: true });
+    }
+  })();
+</script>
 </head>
 
 <body class="bg-tiles theme-gov">
