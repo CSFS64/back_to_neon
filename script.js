@@ -228,13 +228,11 @@ function copyTemplate(btn){
   const panel  = document.getElementById('mapPreviewPanel');
   const btn    = document.getElementById('previewToggle');
   const iframe = document.getElementById('mapPreviewFrame');
-
   if (!wrap || !panel || !btn || !iframe) return;
 
-  // 预览页支持 ?autoShow=1，使 trench 默认显示
-  const MAP_URL = 'https://csfs64.github.io/test2/?autoShow=1';
+  // ✅ 加 embed=1，确保地图页以嵌入模式渲染
+  const MAP_URL = 'https://csfs64.github.io/test2/?embed=1&autoShow=1';
 
-  // 高度策略：16:9，夹在 [MIN_H, MAX_H] 内，避免过高/过扁
   const MAX_H = 520;
   const MIN_H = 220;
 
@@ -243,42 +241,38 @@ function copyTemplate(btn){
 
   function desiredHeight() {
     const w = panel.clientWidth || panel.getBoundingClientRect().width;
-    const h = Math.round(w * 9 / 16);         // 16:9
+    const h = Math.round(w * 9 / 16);   // 16:9
     return Math.max(MIN_H, Math.min(h, MAX_H));
   }
 
-  // 给 iframe 里的地图一个“尺寸已变化”的信号（等价 map.invalidateSize）
+  // 向 iframe 内部发送“resize”信号，等价于 map.invalidateSize()
   function nudgeIframeResize() {
     try {
       if (iframe.contentWindow) {
         iframe.contentWindow.dispatchEvent(new Event('resize'));
       }
-    } catch (_) { /* 跨域等情况忽略 */ }
+    } catch (_) {}
   }
 
   function openPreview({ auto = false } = {}) {
     if (wrap.dataset.state === 'expanded') return;
 
-    // 先定高，再加载，减少 Leaflet 初始化时的条带
     panel.style.height = desiredHeight() + 'px';
     wrap.dataset.state = 'expanded';
     wrap.setAttribute('aria-expanded', 'true');
     btn.setAttribute('aria-expanded', 'true');
     btn.textContent = '▼ 关闭地图预览';
 
-    // 首次展开时再真正加载地图
     if (!firstLoaded) {
       firstLoaded = true;
       iframe.src = MAP_URL;
 
-      // 加载完先 nudge 一次；再稍延时补一次，覆盖过渡尾声
       iframe.addEventListener('load', () => {
         nudgeIframeResize();
         setTimeout(nudgeIframeResize, 80);
       }, { once: true });
     }
 
-    // 高度动画结束后再 nudge 一次，保证最终尺寸正确
     const onEnd = (ev) => {
       if (ev.propertyName === 'height') {
         nudgeIframeResize();
@@ -287,7 +281,6 @@ function copyTemplate(btn){
     };
     panel.addEventListener('transitionend', onEnd);
 
-    // 首屏自动展开 1.5s 后自动收起
     if (auto) {
       clearTimeout(autoTimer);
       autoTimer = setTimeout(closePreview, 1500);
@@ -303,18 +296,11 @@ function copyTemplate(btn){
     btn.textContent = '▶ 打开地图预览';
   }
 
-  function togglePreview() {
-    if (wrap.dataset.state === 'expanded') closePreview();
-    else openPreview();
-  }
-
-  // 交互
   btn.addEventListener('click', () => {
     clearTimeout(autoTimer);
-    togglePreview();
+    (wrap.dataset.state === 'expanded') ? closePreview() : openPreview();
   });
 
-  // 窗口尺寸变化时，同步高度并通知子页面
   window.addEventListener('resize', () => {
     if (wrap.dataset.state === 'expanded') {
       panel.style.height = desiredHeight() + 'px';
@@ -322,6 +308,6 @@ function copyTemplate(btn){
     }
   });
 
-  // 首屏自动打开 1.5s，再自动收起
+  // 首屏自动展开 1.5s，再自动收起
   requestAnimationFrame(() => openPreview({ auto: true }));
 })();
