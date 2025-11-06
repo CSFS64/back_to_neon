@@ -222,3 +222,85 @@ function copyTemplate(btn){
     }
   });
 })();
+
+<script>
+(function(){
+  const wrap   = document.getElementById('mapPreview');
+  const panel  = document.getElementById('mapPreviewPanel');
+  const btn    = document.getElementById('previewToggle');
+  const iframe = document.getElementById('mapPreviewFrame');
+
+  // 你的地图页支持 ?autoShow=1：预览里 trench 默认开启
+  const MAP_URL = 'https://csfs64.github.io/test2/?autoShow=1';
+
+  let firstLoaded = false;
+  let autoTimer   = null;
+
+  // 计算目标高度：用容器宽度 * 比例，做平滑 height 过渡
+  function desiredHeight(){
+    const w = panel.clientWidth || panel.getBoundingClientRect().width;
+    // 桌面感觉 4:3 更“CRT”，窄屏时稍扁
+    const isNarrow = window.matchMedia('(max-width: 980px)').matches;
+    const ratio = isNarrow ? 9/16 : 3/4;
+    return Math.round(w * ratio);
+  }
+
+  // 展开
+  function openPreview({auto=false} = {}){
+    if (wrap.dataset.state === 'expanded') return;
+    // 首次打开时再写入 src，避免未用即加载
+    if (!firstLoaded){
+      iframe.src = MAP_URL;
+      firstLoaded = true;
+    }
+    const h = desiredHeight();
+    panel.style.height = h + 'px';
+    wrap.dataset.state = 'expanded';
+    wrap.setAttribute('aria-expanded', 'true');
+    btn.setAttribute('aria-expanded', 'true');
+    btn.textContent = '▼ 关闭地图预览';
+
+    // 自动收起（仅页面初次自动打开时）
+    if (auto){
+      clearTimeout(autoTimer);
+      autoTimer = setTimeout(closePreview, 1500);
+    }
+  }
+
+  // 收起
+  function closePreview(){
+    if (wrap.dataset.state === 'collapsed') return;
+    // 平滑到 0
+    panel.style.height = '0px';
+    wrap.dataset.state = 'collapsed';
+    wrap.setAttribute('aria-expanded', 'false');
+    btn.setAttribute('aria-expanded', 'false');
+    btn.textContent = '▶ 打开地图预览';
+  }
+
+  // 切换
+  function togglePreview(){
+    if (wrap.dataset.state === 'expanded') closePreview();
+    else openPreview();
+  }
+
+  // 监听按钮
+  if (btn){
+    btn.addEventListener('click', () => {
+      clearTimeout(autoTimer);
+      togglePreview();
+    });
+  }
+
+  // 窗口变化时，若已展开，跟着更新高度（避免断层）
+  window.addEventListener('resize', () => {
+    if (wrap.dataset.state === 'expanded'){
+      panel.style.height = desiredHeight() + 'px';
+    }
+  });
+
+  // 页面加载时：自动打开 1.5s，然后自动收起
+  // 等一帧确保布局完成再测量宽度
+  requestAnimationFrame(() => openPreview({auto:true}));
+})();
+</script>
