@@ -647,40 +647,87 @@ body.contrast-high .ticker { background: #010; border-color: #0f0; }
 
 
 
-/* Projects 区域并排布局 + 预览卡片 */
-.proj-cols{
-  display:grid;
-  grid-template-columns: 1.1fr 0.9fr;
-  gap:16px;
-  align-items:start;
+/* ===================== 预览卡片 ===================== */
+.preview-crt{
+  border: 2px solid #000;
+  background: #fff;
+  box-shadow: 3px 3px 0 #000;
+  font-family: var(--mono-stack);
 }
-.proj-preview{ position:sticky; top:12px; }
-.preview-card{
-  background:rgba(18,24,34,.85);
-  border:1px solid #1f2a3a;
-  border-radius:12px;
-  box-shadow:0 8px 18px rgba(0,0,0,.35);
-  overflow:hidden;
+
+/* 顶部“设备头条”——像老设备铭牌 */
+.preview-crt__head{
+  display:flex; align-items:center; justify-content:space-between;
+  gap: 8px;
+  padding: 6px 8px;
+  border-bottom: 1px dashed #000;
+  background:
+    repeating-linear-gradient(90deg,#e8f2ff 0,#e8f2ff 2px,transparent 2px,transparent 6px),
+    #f4f8ff;
 }
-.preview-title{
-  padding:10px 12px;
-  font:600 13px/1.2 ui-sans-serif,system-ui,Segoe UI,Roboto,Arial;
-  color:#e6edf3;
-  background:linear-gradient(180deg,#0e1521,#0b111a);
-  border-bottom:1px solid #1f2a3a;
+.preview-crt .head-title{
+  font-weight: 800; letter-spacing: .6px;
 }
+.preview-crt .head-meta{
+  font-size: 12px; color: #333;
+}
+
+/* 小绿灯（通电感） */
+.lamp{
+  display:inline-block; width:10px; height:10px; border:1px solid #000; margin-right:4px;
+  box-shadow: 1px 1px 0 #000;
+}
+.lamp--green{ background: #b6ff9b; }
+
+/* 屏幕外框（像素描边） */
+.crt-screen{
+  position: relative;
+  border-top: 1px solid #000;
+  border-bottom: 1px solid #000;
+  background: #000;
+  overflow: hidden;
+}
+
+/* iframe 本体：保持等比，复古页面用像素描边替代圆角玻璃 */
 .preview-frame{
-  display:block;
-  width:100%;
-  aspect-ratio: 4 / 3;   /* 可改成 16/9 或固定高：height:420px */
-  border:0;
+  display:block; width:100%;
+  aspect-ratio: 4 / 3;   /* 桌面 4:3 ；下面媒体查询里改成 16:9 */
+  border: 0;
 }
-.preview-actions{
-  padding:8px 12px 12px;
-  text-align:right;
+
+/* 扫描线 + 轻微暗角：完全不影响交互（用 pointer-events:none）*/
+.crt-screen::after{
+  content:"";
+  position:absolute; inset:0;
+  pointer-events:none;
+  background:
+    linear-gradient(180deg, rgba(0,0,0,0.15), rgba(0,0,0,0) 18%, rgba(0,0,0,0) 82%, rgba(0,0,0,0.15)),
+    repeating-linear-gradient(180deg, rgba(255,255,255,0.06) 0, rgba(255,255,255,0.06) 1px, transparent 1px, transparent 3px);
+  mix-blend-mode: multiply;
 }
+
+/* 底部脚注条（复古按钮区） */
+.preview-crt__foot{
+  display:flex; align-items:center; justify-content:space-between; gap:8px;
+  padding: 6px 8px;
+  background: #fafafa;
+}
+.preview-crt__foot a.inline-link{ font-weight:700; }
+
+/* 布局承接你现有的 .proj-cols */
+.proj-preview{ position: sticky; top: 12px; }
+
+/* 主题融合：使用 .theme-gov 深蓝与红线强调 */
+.theme-gov .preview-crt__head{
+  background: linear-gradient(90deg, var(--gov-blue) 0%, #204f93 60%, #183c70 100%);
+  color: #fff;
+  border-bottom: 2px solid var(--gov-red);
+}
+.theme-gov .lamp{ box-shadow: none; border-color:#fff; }
+.theme-gov .preview-crt__foot{ background:#f3f6fb; }
+
+/* 移动端：单列、改为 16:9，去粘顶 */
 @media (max-width: 980px){
-  .proj-cols{ grid-template-columns: 1fr; }
-  .proj-preview{ position:static; }
+  .proj-preview{ position: static; }
   .preview-frame{ aspect-ratio: 16 / 9; }
 }
