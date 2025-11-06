@@ -6,14 +6,6 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <title>Kalyna OSINT — 导航终端与招募</title>
   <link rel="stylesheet" href="styles.css?v=30">
-  <script>
-  (function(){
-    const q = new URLSearchParams(location.search);
-    if (q.get('autoShow') === '1' || q.get('trench') === 'on') {
-      window.TrenchConfig = Object.assign({}, window.TrenchConfig || {}, { autoShow: true });
-    }
-  })();
-</script>
 </head>
 
 <body class="bg-tiles theme-gov">
@@ -125,61 +117,70 @@
 
           <!-- 项目 -->
           <h2 id="projects" class="highlight-yellow">项目与网站（Projects）</h2>
+          <ul class="dense-list">
+            <li>
+              <b>Kalyna Battle Map</b>：
+              这是我们用于按日期回看战线变化的
+              <a class="inline-link" href="https://csfs64.github.io/test2/" target="_blank" rel="noopener">互动地图</a>
+              ，可在不同日期间切换并对比前线和控制区变化。
+              <a class="inline-link" href="https://www.zhihu.com/zvideo/1960371308807291830" target="_blank" rel="noopener">操作教程</a>见此。<br>
+              <a class="inline-link" href="https://csfs64.github.io/test2/" target="_blank" rel="noopener">Kalyna Battle Map</a>
+              还包括多个实用工具：包括输入坐标跳转、卫星/地形多底图切换、统计领土收益、测量多点距离和面积、绘图和下载无UI前线图片等。
+            </li>
+            <li>
+              <b>FreeLand</b>：
+              面向协作的
+              <a class="inline-link" href="https://csfs64.github.io/hub/#" target="_blank" rel="noopener">社交媒体网站</a>
+              ，用于快速发布想法、分析和文章等，便于用户订阅更新。<br>
+              注意！
+              <a class="inline-link" href="https://csfs64.github.io/hub/#" target="_blank" rel="noopener">FreeLand</a>
+              目前仍处于最后的开发阶段，你仅能看到随机的测试内容且无法注册并使用点赞评论转发等功能，正式发布后我们将在官方账号另行通知。
+            </li>
+          </ul>
 
-          <div class="proj-cols">
-            <div class="proj-main">
-              <ul class="dense-list">
-                <!-- 你原有的两条 <li> 项，不要改动；我只是把它们包到 .proj-main 里 -->
-                <li>
-                  <b>Kalyna Battle Map</b>：
-                  这是我们用于按日期回看战线变化的
-                  <a class="inline-link" href="https://csfs64.github.io/test2/" target="_blank" rel="noopener">互动地图</a>
-                  ，可在不同日期间切换并对比前线和控制区变化。
-                  <a class="inline-link" href="https://www.zhihu.com/zvideo/1960371308807291830" target="_blank" rel="noopener">操作教程</a>见此。<br>
-                  <a class="inline-link" href="https://csfs64.github.io/test2/" target="_blank" rel="noopener">Kalyna Battle Map</a>
-                  还包括多个实用工具：包括输入坐标跳转、卫星/地形多底图切换、统计领土收益、测量多点距离和面积、绘图和下载无UI前线图片等。
-                </li>
-                <li>
-                  <b>FreeLand</b>：
-                  面向协作的
-                  <a class="inline-link" href="https://csfs64.github.io/hub/#" target="_blank" rel="noopener">社交媒体网站</a>
-                  ，用于快速发布想法、分析和文章等，便于用户订阅更新。<br>
-                  注意！
-                  <a class="inline-link" href="https://csfs64.github.io/hub/#" target="_blank" rel="noopener">FreeLand</a>
-                  目前仍处于最后的开发阶段，你仅能看到随机的测试内容且无法注册并使用点赞评论转发等功能，正式发布后我们将在官方账号另行通知。
-                </li>
-              </ul>
+          <section class="section-box" id="projects-preview">
+            <div class="section-head">
+              <span class="section-tag">SECTION</span>
+              <h2 class="section-title">地图预览（Map Preview）</h2>
             </div>
+            <div class="section-body">
           
-            <!-- 地图预览 -->
-            <aside class="proj-preview" aria-label="Kalyna Battle Map 预览">
-              <div class="preview-crt">
-                <div class="preview-crt__head">
-                  <span class="lamp lamp--green" aria-hidden="true"></span>
-                  <span class="head-title">BATTLE MAP / PREVIEW</span>
-                  <span class="head-meta">TR: ON (AUTO)</span>
-                </div>
-            
-                <div class="crt-screen">
-                  <iframe
-                    class="preview-frame"
-                    src="https://csfs64.github.io/test2/?autoShow=1"
-                    title="Kalyna Battle Map Preview"
-                    loading="lazy"
-                    referrerpolicy="no-referrer"
-                    allowfullscreen
-                  ></iframe>
-                  <!-- 扫描线覆盖层在 CSS 里用 ::after 做，不会影响点击 -->
-                </div>
-            
-                <div class="preview-crt__foot">
-                  <span>PRESS ▶ TO VIEW FULL</span>
-                  <a class="inline-link" href="https://csfs64.github.io/test2/" target="_blank" rel="noopener">OPEN FULL MAP →</a>
+              <div class="preview-wrap" id="mapPreview" data-state="collapsed" aria-expanded="false">
+                <!-- 左上角切换按钮 -->
+                <button type="button" class="preview-toggle" id="previewToggle"
+                        aria-controls="mapPreviewPanel" aria-expanded="false">
+                  ▶ 打开地图预览
+                </button>
+          
+                <!-- 可折叠面板（有动画，不会遮住下面内容） -->
+                <div class="preview-panel" id="mapPreviewPanel" role="region" aria-label="Battle Map 预览">
+                  <div class="preview-crt">
+                    <div class="preview-crt__head">
+                      <span class="lamp lamp--green" aria-hidden="true"></span>
+                      <span class="head-title">BATTLE MAP / PREVIEW</span>
+                      <span class="head-meta">TR: ON (AUTO)</span>
+                    </div>
+          
+                    <div class="crt-screen">
+                      <!-- 注意：首次打开时才写入 src，避免无谓加载 -->
+                      <iframe class="preview-frame" id="mapPreviewFrame"
+                              title="Kalyna Battle Map Preview"
+                              loading="lazy" referrerpolicy="no-referrer" allowfullscreen></iframe>
+                    </div>
+          
+                    <div class="preview-crt__foot">
+                      <span>PRESS ▶ 点击右侧链接打开完整地图</span>
+                      <a class="inline-link" href="https://csfs64.github.io/test2/" target="_blank" rel="noopener">
+                        在新窗口打开 →
+                      </a>
+                    </div>
+                  </div>
                 </div>
               </div>
-            </aside>
-          </div>
           
+            </div>
+          </section>
+
           <!-- 更新与分析 -->
           <section class="section-box">
             <div class="section-head">
