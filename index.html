@@ -151,20 +151,30 @@
               </ul>
             </div>
           
-            <!-- 右侧地图预览 -->
+            <!-- 地图预览 -->
             <aside class="proj-preview" aria-label="Kalyna Battle Map 预览">
-              <div class="preview-card">
-                <div class="preview-title">Battle Map 预览（Trench 默认开启）</div>
-                <iframe
-                  class="preview-frame"
-                  src="https://csfs64.github.io/test2/?autoShow=1"
-                  title="Kalyna Battle Map Preview"
-                  loading="lazy"
-                  referrerpolicy="no-referrer"
-                  allowfullscreen
-                ></iframe>
-                <div class="preview-actions">
-                  <a class="inline-link" href="https://csfs64.github.io/test2/" target="_blank" rel="noopener">在新窗口打开完整地图 →</a>
+              <div class="preview-crt">
+                <div class="preview-crt__head">
+                  <span class="lamp lamp--green" aria-hidden="true"></span>
+                  <span class="head-title">BATTLE MAP / PREVIEW</span>
+                  <span class="head-meta">TR: ON (AUTO)</span>
+                </div>
+            
+                <div class="crt-screen">
+                  <iframe
+                    class="preview-frame"
+                    src="https://csfs64.github.io/test2/?autoShow=1"
+                    title="Kalyna Battle Map Preview"
+                    loading="lazy"
+                    referrerpolicy="no-referrer"
+                    allowfullscreen
+                  ></iframe>
+                  <!-- 扫描线覆盖层在 CSS 里用 ::after 做，不会影响点击 -->
+                </div>
+            
+                <div class="preview-crt__foot">
+                  <span>PRESS ▶ TO VIEW FULL</span>
+                  <a class="inline-link" href="https://csfs64.github.io/test2/" target="_blank" rel="noopener">OPEN FULL MAP →</a>
                 </div>
               </div>
             </aside>
