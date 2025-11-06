@@ -695,6 +695,8 @@ body.contrast-high .ticker { background: #010; border-color: #0f0; }
   border-top: 1px dashed #000;
   background: #fff;
   font-family: var(--mono-stack);
+  display: flex;               /* 新增：让屏幕区撑满 */
+  flex-direction: column;
 }
 
 /* 顶部铭牌区 */
@@ -726,26 +728,18 @@ body.contrast-high .ticker { background: #010; border-color: #0f0; }
   border-bottom:1px solid #000;
   background:#000;
   overflow:hidden;
+  flex:1 1 auto;             /* 新增：吃掉剩余高度 */
+  min-height:160px;          /* 避免塌陷 */
 }
 
+/* iframe 铺满父容器 */
 .preview-frame{
-  display: block;
-  width: 100%;
-  height: 100%;
-  border: 0;
-  /* 可选：铺满父容器而不是仅依赖文档流 */
-  position: absolute;
-  inset: 0;
-}
-
-/* 由父容器（.preview-panel）控制高度；iframe 填满 */
-.preview-panel{
-  position: relative;          /* 新增：让子元素绝对铺满可选 */
-  overflow: hidden;
-  height: 0;
-  opacity: 0;
-  transition: height .4s ease, opacity .3s ease;
-  pointer-events: none;
+  display:block;
+  width:100%;
+  height:100%;
+  border:0;
+  position:absolute;
+  inset:0;
 }
 
 .crt-screen::after{
@@ -772,3 +766,8 @@ body.contrast-high .ticker { background: #010; border-color: #0f0; }
 }
 .theme-gov .lamp{ box-shadow:none; border-color:#fff; }
 .theme-gov .preview-crt__foot{ background:#f3f6fb; }
+
+/* ===================== 响应式 ===================== */
+@media (max-width:980px){
+  .preview-frame{ height:100%; width:100%; } /* 仍保持铺满 */
+}
