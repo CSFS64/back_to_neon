@@ -655,7 +655,7 @@ body.contrast-high .ticker { background: #010; border-color: #0f0; }
   border: 1px solid #000;
   background: #fff;
   box-shadow: 2px 2px 0 #000;
-  padding-top: 34px;           /* 给左上角按钮留空间 */
+  padding-top: 34px;        /* 给左上角按钮留空间 */
 }
 
 /* 左上角 ▶ 按钮 */
@@ -676,8 +676,9 @@ body.contrast-high .ticker { background: #010; border-color: #0f0; }
   outline-offset: 2px;
 }
 
-/* 折叠面板：height 过渡，不遮住下方内容 */
+/* 折叠面板：height 过渡；iframe 100% 填充其高度 */
 .preview-panel{
+  position: relative;
   overflow: hidden;
   height: 0;
   opacity: 0;
@@ -708,22 +709,13 @@ body.contrast-high .ticker { background: #010; border-color: #0f0; }
     repeating-linear-gradient(90deg,#e8f2ff 0,#e8f2ff 2px,transparent 2px,transparent 6px),
     #f4f8ff;
 }
-.preview-crt .head-title{
-  font-weight:800;
-  letter-spacing:.6px;
-}
-.preview-crt .head-meta{
-  font-size:12px;
-  color:#333;
-}
+.preview-crt .head-title{ font-weight:800; letter-spacing:.6px; }
+.preview-crt .head-meta{ font-size:12px; color:#333; }
 
 /* 指示灯 */
 .lamp{
-  display:inline-block;
-  width:10px; height:10px;
-  border:1px solid #000;
-  margin-right:4px;
-  box-shadow:1px 1px 0 #000;
+  display:inline-block; width:10px; height:10px;
+  border:1px solid #000; margin-right:4px; box-shadow:1px 1px 0 #000;
 }
 .lamp--green{ background:#b6ff9b; }
 
@@ -735,15 +727,15 @@ body.contrast-high .ticker { background: #010; border-color: #0f0; }
   background:#000;
   overflow:hidden;
 }
+
+/* 由父容器（.preview-panel）控制高度；iframe 填满 */
 .preview-frame{
-  display:block;
-  width:100%;
-  border:0;
+  display:block; width:100%; height:100%; border:0; /* 关键：height:100% */
 }
+
 .crt-screen::after{
   content:"";
-  position:absolute;
-  inset:0;
+  position:absolute; inset:0;
   pointer-events:none;
   background:
     linear-gradient(180deg, rgba(0,0,0,0.15), rgba(0,0,0,0) 18%, rgba(0,0,0,0) 82%, rgba(0,0,0,0.15)),
@@ -753,32 +745,15 @@ body.contrast-high .ticker { background: #010; border-color: #0f0; }
 
 /* 底部脚注区 */
 .preview-crt__foot{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:8px;
-  padding:6px 8px;
-  background:#fafafa;
+  display:flex; align-items:center; justify-content:space-between; gap:8px;
+  padding:6px 8px; background:#fafafa;
 }
-.preview-crt__foot a.inline-link{
-  font-weight:700;
-}
+.preview-crt__foot a.inline-link{ font-weight:700; }
 
 /* ===================== 主题融合（theme-gov） ===================== */
 .theme-gov .preview-crt__head{
   background: linear-gradient(90deg, var(--gov-blue) 0%, #204f93 60%, #183c70 100%);
-  color:#fff;
-  border-bottom:2px solid var(--gov-red);
+  color:#fff; border-bottom:2px solid var(--gov-red);
 }
-.theme-gov .lamp{
-  box-shadow:none;
-  border-color:#fff;
-}
-.theme-gov .preview-crt__foot{
-  background:#f3f6fb;
-}
-
-/* ===================== 响应式 ===================== */
-@media (max-width:980px){
-  .preview-frame{ aspect-ratio:16/9; }
-}
+.theme-gov .lamp{ box-shadow:none; border-color:#fff; }
+.theme-gov .preview-crt__foot{ background:#f3f6fb; }
