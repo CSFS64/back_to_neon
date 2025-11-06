@@ -117,27 +117,51 @@
 
           <!-- 项目 -->
           <h2 id="projects" class="highlight-yellow">项目与网站（Projects）</h2>
-          <ul class="dense-list">
-            <li>
-              <b>Kalyna Battle Map</b>：
-              这是我们用于按日期回看战线变化的
-              <a class="inline-link" href="https://csfs64.github.io/test2/" target="_blank" rel="noopener">互动地图</a>
-              ，可在不同日期间切换并对比前线和控制区变化。
-              <a class="inline-link" href="https://www.zhihu.com/zvideo/1960371308807291830" target="_blank" rel="noopener">操作教程</a>见此。<br>
-              <a class="inline-link" href="https://csfs64.github.io/test2/" target="_blank" rel="noopener">Kalyna Battle Map</a>
-              还包括多个实用工具：包括输入坐标跳转、卫星/地形多底图切换、统计领土收益、测量多点距离和面积、绘图和下载无UI前线图片等。
-            </li>
-            <li>
-              <b>FreeLand</b>：
-              面向协作的
-              <a class="inline-link" href="https://csfs64.github.io/hub/#" target="_blank" rel="noopener">社交媒体网站</a>
-              ，用于快速发布想法、分析和文章等，便于用户订阅更新。<br>
-              注意！
-              <a class="inline-link" href="https://csfs64.github.io/hub/#" target="_blank" rel="noopener">FreeLand</a>
-              目前仍处于最后的开发阶段，你仅能看到随机的测试内容且无法注册并使用点赞评论转发等功能，正式发布后我们将在官方账号另行通知。
-            </li>
-          </ul>
 
+          <div class="proj-cols">
+            <div class="proj-main">
+              <ul class="dense-list">
+                <!-- 你原有的两条 <li> 项，不要改动；我只是把它们包到 .proj-main 里 -->
+                <li>
+                  <b>Kalyna Battle Map</b>：
+                  这是我们用于按日期回看战线变化的
+                  <a class="inline-link" href="https://csfs64.github.io/test2/" target="_blank" rel="noopener">互动地图</a>
+                  ，可在不同日期间切换并对比前线和控制区变化。
+                  <a class="inline-link" href="https://www.zhihu.com/zvideo/1960371308807291830" target="_blank" rel="noopener">操作教程</a>见此。<br>
+                  <a class="inline-link" href="https://csfs64.github.io/test2/" target="_blank" rel="noopener">Kalyna Battle Map</a>
+                  还包括多个实用工具：包括输入坐标跳转、卫星/地形多底图切换、统计领土收益、测量多点距离和面积、绘图和下载无UI前线图片等。
+                </li>
+                <li>
+                  <b>FreeLand</b>：
+                  面向协作的
+                  <a class="inline-link" href="https://csfs64.github.io/hub/#" target="_blank" rel="noopener">社交媒体网站</a>
+                  ，用于快速发布想法、分析和文章等，便于用户订阅更新。<br>
+                  注意！
+                  <a class="inline-link" href="https://csfs64.github.io/hub/#" target="_blank" rel="noopener">FreeLand</a>
+                  目前仍处于最后的开发阶段，你仅能看到随机的测试内容且无法注册并使用点赞评论转发等功能，正式发布后我们将在官方账号另行通知。
+                </li>
+              </ul>
+            </div>
+          
+            <!-- 右侧地图预览 -->
+            <aside class="proj-preview" aria-label="Kalyna Battle Map 预览">
+              <div class="preview-card">
+                <div class="preview-title">Battle Map 预览（Trench 默认开启）</div>
+                <iframe
+                  class="preview-frame"
+                  src="https://csfs64.github.io/test2/?autoShow=1"
+                  title="Kalyna Battle Map Preview"
+                  loading="lazy"
+                  referrerpolicy="no-referrer"
+                  allowfullscreen
+                ></iframe>
+                <div class="preview-actions">
+                  <a class="inline-link" href="https://csfs64.github.io/test2/" target="_blank" rel="noopener">在新窗口打开完整地图 →</a>
+                </div>
+              </div>
+            </aside>
+          </div>
+          
           <!-- 更新与分析 -->
           <section class="section-box">
             <div class="section-head">
