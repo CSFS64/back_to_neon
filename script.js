@@ -279,5 +279,5 @@ function copyTemplate(btn){
     }
   });
 
-  // 初始保持折叠，用户手动点开
+  requestAnimationFrame(open);
 })();
