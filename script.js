@@ -222,3 +222,62 @@ function copyTemplate(btn){
     }
   });
 })();
+
+(() => {
+  const box    = document.getElementById('mpv');
+  const panel  = document.getElementById('mpvPanel');
+  const btn    = document.getElementById('mpvToggle');
+  const frame  = document.getElementById('mpvFrame');
+  if(!box || !panel || !btn || !frame) return;
+
+  // 使用 embed=1 简化被嵌入时的样式；autoShow=1 让你的地图默认显示 trench
+  const MAP_URL = 'https://csfs64.github.io/test2/?embed=1&autoShow=1';
+
+  const MIN_H = 220, MAX_H = 520; // 高度下限/上限，避免过矮或过高
+  let loaded = false;
+
+  function targetHeight(){
+    const w = panel.clientWidth || panel.getBoundingClientRect().width;
+    const h = Math.round(w * 9 / 16);      // 16:9
+    return Math.max(MIN_H, Math.min(h, MAX_H));
+  }
+  function pokeResize(){
+    try{ frame.contentWindow && frame.contentWindow.dispatchEvent(new Event('resize')); }catch(e){}
+  }
+
+  function open(){
+    if (box.dataset.state === 'expanded') return;
+    panel.style.height = targetHeight() + 'px';
+    box.dataset.state = 'expanded';
+    box.setAttribute('aria-expanded','true');
+    btn.setAttribute('aria-expanded','true');
+    btn.textContent = '▼ 地图预览';
+
+    if (!loaded){
+      loaded = true;
+      frame.src = MAP_URL;
+      frame.addEventListener('load', () => { pokeResize(); setTimeout(pokeResize, 80); }, {once:true});
+    }
+  }
+  function close(){
+    if (box.dataset.state === 'collapsed') return;
+    panel.style.height = '0px';
+    box.dataset.state = 'collapsed';
+    box.setAttribute('aria-expanded','false');
+    btn.setAttribute('aria-expanded','false');
+    btn.textContent = '▶ 地图预览';
+  }
+
+  btn.addEventListener('click', () => {
+    (box.dataset.state === 'expanded') ? close() : open();
+  });
+
+  window.addEventListener('resize', () => {
+    if (box.dataset.state === 'expanded'){
+      panel.style.height = targetHeight() + 'px';
+      pokeResize();
+    }
+  });
+
+  // 初始保持折叠，用户手动点开
+})();
