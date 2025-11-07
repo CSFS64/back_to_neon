@@ -218,7 +218,7 @@ function copyTemplate(btn){
 
     if (auto){
       clearTimeout(autoTimer);
-      autoTimer = setTimeout(close, 1500);   // 自动收起
+      autoTimer = setTimeout(close, 2500);   // 自动收起
     }
   }
 
