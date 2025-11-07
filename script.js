@@ -1,48 +1,4 @@
 ; (function () {
-  var CONSENT_KEY = 'kalyna_consent_v1';
-  var HIT_KEY = 'kalyna_hits_v1';
-  var banner = document.getElementById('consentBanner');
-  if (!banner) return;
-
-  var choice = null;
-  try { choice = localStorage.getItem(CONSENT_KEY); } catch (e) {}
-
-  // —— 只在允许时更新访问计数
-  function updateHitCounterIfAllowed() {
-    if (choice !== 'allow') return;
-    try {
-      var count = parseInt(localStorage.getItem(HIT_KEY) || '0', 10) + 1;
-      localStorage.setItem(HIT_KEY, String(count));
-      var el = document.getElementById('hitCounter');
-      if (el) el.textContent = '[' + String(count).padStart(6, '0') + ']';
-    } catch (e) {}
-  }
-
-  // 初次访问：显示同意条；否则根据选择更新计数
-  if (!choice) {
-    banner.hidden = false;
-  } else {
-    updateHitCounterIfAllowed();
-  }
-
-  // 绑定按钮
-  var allowBtn = document.getElementById('consentAllow');
-  var denyBtn  = document.getElementById('consentDeny');
-
-  if (allowBtn) allowBtn.addEventListener('click', function () {
-    try { localStorage.setItem(CONSENT_KEY, 'allow'); } catch (e) {}
-    choice = 'allow';
-    updateHitCounterIfAllowed();
-    banner.remove();
-  });
-
-  if (denyBtn) denyBtn.addEventListener('click', function () {
-    try { localStorage.setItem(CONSENT_KEY, 'deny'); } catch (e) {}
-    banner.remove();
-  });
-})();
-
-; (function () {
   // 年份与更新时间
   var now = new Date();
   var y = document.getElementById('year');
@@ -223,29 +179,31 @@ function copyTemplate(btn){
   });
 })();
 
+<script>
 (() => {
-  const box    = document.getElementById('mpv');
-  const panel  = document.getElementById('mpvPanel');
-  const btn    = document.getElementById('mpvToggle');
-  const frame  = document.getElementById('mpvFrame');
-  if(!box || !panel || !btn || !frame) return;
+  const box   = document.getElementById('mpv');
+  const panel = document.getElementById('mpvPanel');
+  const btn   = document.getElementById('mpvToggle');
+  const frame = document.getElementById('mpvFrame');
+  if (!box || !panel || !btn || !frame) return;
 
-  // 使用 embed=1 简化被嵌入时的样式；autoShow=1 让你的地图默认显示 trench
+  // 让被嵌入页按你的 embed 规则渲染；autoShow=1 维持 trench 等默认显示
   const MAP_URL = 'https://csfs64.github.io/test2/?embed=1&autoShow=1';
 
-  const MIN_H = 220, MAX_H = 520; // 高度下限/上限，避免过矮或过高
+  const MIN_H = 220, MAX_H = 520;
   let loaded = false;
+  let autoTimer = null;   // 1.5s 自动收起的定时器
 
   function targetHeight(){
     const w = panel.clientWidth || panel.getBoundingClientRect().width;
-    const h = Math.round(w * 9 / 16);      // 16:9
+    const h = Math.round(w * 9 / 16); // 16:9
     return Math.max(MIN_H, Math.min(h, MAX_H));
   }
-  function pokeResize(){
-    try{ frame.contentWindow && frame.contentWindow.dispatchEvent(new Event('resize')); }catch(e){}
+  function nudgeResize(){
+    try { frame.contentWindow && frame.contentWindow.dispatchEvent(new Event('resize')); } catch (_) {}
   }
 
-  function open(){
+  function open({auto=false} = {}){
     if (box.dataset.state === 'expanded') return;
     panel.style.height = targetHeight() + 'px';
     box.dataset.state = 'expanded';
@@ -256,10 +214,17 @@ function copyTemplate(btn){
     if (!loaded){
       loaded = true;
       frame.src = MAP_URL;
-      frame.addEventListener('load', () => { pokeResize(); setTimeout(pokeResize, 80); }, {once:true});
+      frame.addEventListener('load', () => { nudgeResize(); setTimeout(nudgeResize, 80); }, { once:true });
+    }
+
+    if (auto){
+      clearTimeout(autoTimer);
+      autoTimer = setTimeout(close, 1500);   // 自动收起
     }
   }
+
   function close(){
+    clearTimeout(autoTimer);
     if (box.dataset.state === 'collapsed') return;
     panel.style.height = '0px';
     box.dataset.state = 'collapsed';
@@ -268,16 +233,22 @@ function copyTemplate(btn){
     btn.textContent = '▶ 地图预览';
   }
 
-  btn.addEventListener('click', () => {
+  function toggle(){
+    clearTimeout(autoTimer);  // 用户手动时，取消自动收起
     (box.dataset.state === 'expanded') ? close() : open();
-  });
+  }
 
+  // 交互
+  btn.addEventListener('click', toggle);
+
+  // 窗口尺寸变化时，同步高度并通知子页面
   window.addEventListener('resize', () => {
     if (box.dataset.state === 'expanded'){
       panel.style.height = targetHeight() + 'px';
-      pokeResize();
+      nudgeResize();
     }
   });
 
-  requestAnimationFrame(open);
+  requestAnimationFrame(() => open({auto:true}));
 })();
+</script>
