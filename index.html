@@ -117,6 +117,26 @@
 
           <!-- 项目 -->
           <h2 id="projects" class="highlight-yellow">项目与网站（Projects）</h2>
+          <!-- 地图预览 -->
+          <div class="mpv" id="mpv" data-state="collapsed" aria-expanded="false">
+            <div class="mpv__bar">
+              <button class="mpv__toggle" id="mpvToggle" aria-expanded="false" aria-controls="mpvPanel">
+                ▶ 地图预览
+              </button>
+              <a class="mpv__full" href="https://csfs64.github.io/test2/" target="_blank" rel="noopener">查看完整地图 →</a>
+            </div>
+          
+            <div class="mpv__panel" id="mpvPanel" role="region" aria-label="Map Preview">
+              <iframe
+                id="mpvFrame"
+                class="mpv__frame"
+                title="Kalyna Battle Map Preview"
+                loading="lazy"
+                referrerpolicy="no-referrer"
+                allowfullscreen>
+              </iframe>
+            </div>
+          </div>
           <ul class="dense-list">
             <li>
               <b>Kalyna Battle Map</b>：
