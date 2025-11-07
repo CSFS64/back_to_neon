@@ -179,7 +179,6 @@ function copyTemplate(btn){
   });
 })();
 
-<script>
 (() => {
   const box   = document.getElementById('mpv');
   const panel = document.getElementById('mpvPanel');
@@ -251,4 +250,3 @@ function copyTemplate(btn){
 
   requestAnimationFrame(() => open({auto:true}));
 })();
-</script>
