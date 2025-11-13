@@ -21,7 +21,7 @@
     background: rgba(0, 0, 0, 0.82);
     backdrop-filter: blur(6px);
     -webkit-backdrop-filter: blur(6px);
-    pointer-events: auto;           /* 拦截所有点击 */
+    pointer-events: auto;
   }
 
   .kmnt-panel {
@@ -89,7 +89,7 @@
   overlay.innerHTML = `
     <div class="kmnt-panel">
       <div class="kmnt-title">
-        <span class="kmnt-badge">SYSTEM</span> MAINTENANCE NOTICE
+        <span class="kmnt-badge">KALYNA</span> MAINTENANCE NOTICE
       </div>
       <div class="kmnt-line kmnt-line-main">
         当前无法访问
