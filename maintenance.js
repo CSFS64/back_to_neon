@@ -1,42 +1,114 @@
 (() => {
-  const on = !!(window.__MAINTENANCE__ || document.currentScript?.dataset?.on === "true");
-  if (!on) return;
+  const MAINTENANCE_ON = true;
 
-  document.documentElement.classList.add('is-maintenance');
+  if (!MAINTENANCE_ON) return;
 
-  const css = `
-  .maint-overlay{
-    position: fixed; inset: 0; z-index: 2147483000;
-    display: grid; place-items: center;
-    background: rgba(0,0,0,.25);
+  const html = document.documentElement;
+  const body = document.body;
+  html.style.overflow = 'hidden';
+  body.style.overflow = 'hidden';
+
+  const style = document.createElement('style');
+  style.textContent = `
+  .kmnt-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 999999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    background: rgba(0, 0, 0, 0.82);
     backdrop-filter: blur(6px);
     -webkit-backdrop-filter: blur(6px);
+    pointer-events: auto;           /* 拦截所有点击 */
   }
-  .maint-card{
-    max-width: min(90vw, 720px);
-    padding: 20px 24px;
-    background: rgba(255,255,255,.92);
-    color:#111; border-radius: 12px;
-    box-shadow: 0 10px 30px rgba(0,0,0,.25);
-    text-align: center; font: 700 18px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+
+  .kmnt-panel {
+    max-width: 520px;
+    width: 100%;
+    background: #050608;
+    border: 1px solid #1aff7a;
+    box-shadow:
+      0 0 0 1px rgba(0,0,0,0.8),
+      0 0 32px rgba(0, 0, 0, 0.9);
+    padding: 22px 24px 18px;
+    color: #e6fff0;
+    font-family: "Fira Code", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
   }
-  .maint-card p{ margin: 6px 0 0; font-weight: 600; opacity: .8; }
-  .is-maintenance body{ opacity:.65; }
-  html.is-maintenance body > *:not(.maint-overlay){ pointer-events:none; }
+
+  .kmnt-title {
+    font-size: 13px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: #1aff7a;
+    border-bottom: 1px solid rgba(26, 255, 122, 0.5);
+    padding-bottom: 6px;
+    margin-bottom: 12px;
+  }
+
+  .kmnt-line-main {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 10px;
+    color: #ffffff;
+  }
+
+  .kmnt-line {
+    font-size: 14px;
+    line-height: 1.6;
+    color: #c7f5dc;
+  }
+
+  .kmnt-line-sub {
+    font-size: 12px;
+    margin-top: 10px;
+    color: #80cfa5;
+    opacity: 0.9;
+  }
+
+  .kmnt-badge {
+    display: inline-block;
+    padding: 0 6px;
+    margin-right: 6px;
+    border-radius: 3px;
+    background: #1aff7a;
+    color: #04120a;
+    font-size: 11px;
+    font-weight: 700;
+  }
   `;
-  const style = document.createElement('style'); style.textContent = css;
   document.head.appendChild(style);
 
-  const wrap = document.createElement('div');
-  wrap.className = 'maint-overlay';
-  wrap.setAttribute('role','dialog');
-  wrap.setAttribute('aria-modal','true');
-  wrap.setAttribute('aria-label','Site maintenance');
-  wrap.innerHTML = `
-    <div class="maint-card">
-      <div style="font-size:20px;">无法访问</div>
-      <p>由于维护，网站更新已暂停</p>
+  const overlay = document.createElement('div');
+  overlay.className = 'kmnt-overlay';
+  overlay.setAttribute('role', 'dialog');
+  overlay.setAttribute('aria-modal', 'true');
+  overlay.setAttribute('aria-label', 'Kalyna OSINT 维护通知');
+
+  overlay.innerHTML = `
+    <div class="kmnt-panel">
+      <div class="kmnt-title">
+        <span class="kmnt-badge">SYSTEM</span> MAINTENANCE NOTICE
+      </div>
+      <div class="kmnt-line kmnt-line-main">
+        网站维护中：当前无法访问
+      </div>
+      <div class="kmnt-line">
+        由于维护，网站更新已暂停。<br>
+        地图、分析与工具暂时处于只读 / 不可用状态。
+      </div>
+      <div class="kmnt-line kmnt-line-sub">
+        请稍后再试。如果你是维护者，可以在
+        <code>assets/maintenance.js</code> 中将 <code>MAINTENANCE_ON</code> 设置为 <code>false</code> 以恢复访问。
+      </div>
     </div>
   `;
-  document.body.appendChild(wrap);
+
+  const mount = () => (document.body || document.documentElement).appendChild(overlay);
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', mount);
+  } else {
+    mount();
+  }
 })();
