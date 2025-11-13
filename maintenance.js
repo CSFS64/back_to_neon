@@ -92,15 +92,13 @@
         <span class="kmnt-badge">SYSTEM</span> MAINTENANCE NOTICE
       </div>
       <div class="kmnt-line kmnt-line-main">
-        网站维护中：当前无法访问
+        当前无法访问
       </div>
       <div class="kmnt-line">
-        由于维护，网站更新已暂停。<br>
-        地图、分析与工具暂时处于只读 / 不可用状态。
+        由于内部原因，网站更新已暂停。
       </div>
       <div class="kmnt-line kmnt-line-sub">
-        请稍后再试。如果你是维护者，可以在
-        <code>assets/maintenance.js</code> 中将 <code>MAINTENANCE_ON</code> 设置为 <code>false</code> 以恢复访问。
+        请在官方账号等待更多信息。
       </div>
     </div>
   `;
