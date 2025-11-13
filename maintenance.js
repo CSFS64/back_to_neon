@@ -1,5 +1,5 @@
 (() => {
-  const MAINTENANCE_ON = true;
+  const MAINTENANCE_ON = false;
 
   if (!MAINTENANCE_ON) return;
 
