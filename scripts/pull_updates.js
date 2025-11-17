@@ -50,102 +50,12 @@ await fs.mkdir("data", { recursive: true });
 await fs.writeFile(OUT_PATH, JSON.stringify(result, null, 2), "utf8");
 console.log(`OK: 写入 ${OUT_PATH}，共 ${result.length} 条。`);
 
-/* ------------------------ 工具函数区：抓取 + 镜像容错 ------------------------ */
-
-// 默认镜像（可用环境变量 RSS_MIRRORS 覆盖，多行/逗号分隔均可）
-const DEFAULT_MIRRORS = (process.env.RSS_MIRRORS || `
-https://rsshub.uneasy.win
-https://rsshub.woodland.cafe
-https://rsshub.moeyy.cn
-`).split(/\n|,/).map(s => s.trim()).filter(Boolean);
-
-// 单次请求超时（毫秒）
-const FETCH_TIMEOUT_MS = parseInt(process.env.RSS_TIMEOUT_MS || "12000", 10);
-// 对同一个 URL 的重试次数（网络抖动时有用）
-const RETRIES_PER_HOST = parseInt(process.env.RSS_RETRIES || "1", 10);
-
-// 简单超时包装
-function withTimeout(promise, ms = FETCH_TIMEOUT_MS) {
-  return Promise.race([
-    promise,
-    new Promise((_, rej) => setTimeout(() => rej(new Error("timeout")), ms))
-  ]);
-}
-
-// 判断是不是 rsshub.app
-function isRSSHubHost(u) {
-  try {
-    const host = new URL(u).hostname.replace(/^www\./, "");
-    return host === "rsshub.app";
-  } catch {
-    return false;
-  }
-}
-
-// 构造要尝试的 URL 列表：
-// - 如果是 rsshub.app 就把同一路径拼到镜像；并把原始 URL 放在第一个（万一恢复了）
-// - 如果是别的站点，就只试原始 URL
-function buildMirrorList(url) {
-  try {
-    const u = new URL(url);
-    if (isRSSHubHost(url)) {
-      const path = u.pathname + (u.search || "");
-      const list = [
-        url,
-        ...DEFAULT_MIRRORS.map(m => m.replace(/\/+$/, "") + path)
-      ];
-      // 去重，保序
-      return Array.from(new Set(list));
-    }
-    return [url];
-  } catch {
-    return [url];
-  }
-}
-
-async function fetchOnce(u, init) {
-  const res = await withTimeout(fetch(u, init));
+/* ------------------------ 工具函数区 ------------------------ */
+async function fetchText(url) {
+  const res = await fetch(url, { headers: { "User-Agent": "KalynaOSINT-RSS/1.0" } });
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
   return await res.text();
 }
-
-async function fetchWithRetries(u, init) {
-  let lastErr;
-  for (let i = 0; i <= RETRIES_PER_HOST; i++) {
-    try {
-      return await fetchOnce(u, init);
-    } catch (e) {
-      lastErr = e;
-      // 小退避，避免瞬间打爆镜像
-      await new Promise(r => setTimeout(r, 250 * (i + 1)));
-    }
-  }
-  throw lastErr || new Error("unknown fetch error");
-}
-
-async function fetchText(url) {
-  const init = { headers: { "User-Agent": "KalynaOSINT-RSS/1.0" } };
-  const candidates = buildMirrorList(url);
-  let lastErr;
-
-  for (const u of candidates) {
-    try {
-      const txt = await fetchWithRetries(u, init);
-      if (u !== url) {
-        console.log(`[mirror] ${url} -> OK via ${u}`);
-      }
-      return txt;
-    } catch (e) {
-      lastErr = e;
-      console.warn(`[mirror] fail ${u}: ${String(e.message || e).slice(0, 120)}`);
-      continue;
-    }
-  }
-
-  throw new Error(`All mirrors failed for ${url}: ${String(lastErr && lastErr.message || lastErr)}`);
-}
-
-/* ------------------------ RSS 解析 & 映射 ------------------------ */
 
 // 极简 RSS 解析（足以应对 RSSHub 常见字段）
 function parseRSS(xml) {
