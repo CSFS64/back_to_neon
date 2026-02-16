@@ -1,9 +1,15 @@
 /* =========================================================
-   终端等宽字体栈
+   终端等宽字体栈 + 分割线
    ========================================================= */
 :root {
   --mono-stack: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
     "Liberation Mono", "Lucida Console", "DejaVu Sans Mono", "Courier New", monospace;
+}
+
+hr{
+  border: none;
+  border-top: 2px solid #000;
+  margin: 2em 0;
 }
 
 /* =========================================================
