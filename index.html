@@ -138,7 +138,7 @@
             </li>
             <li>
               <b>Kalyna 前线笔记(KFN)</b>：
-              这是由我们维护并用于整理与阅读分析性前线笔记、行动简报及参考资料的<a class="inline-link" href="https://csfs64.github.io/KFN/" target="_blank" rel="noopener">归档平台</a>，面向当代冲突环境研究与信息整理。KFN 提供结构化文档的阅读、检索与引用支持。所有文档均以 .docx 及 APA-7 学术排版原貌转换呈现，且提供.pdf下载。
+              这是由我们维护并用于整理与阅读分析性前线笔记、行动简报及参考资料的<a class="inline-link" href="https://csfs64.github.io/KFN/" target="_blank" rel="noopener">归档平台</a>，面向当代冲突环境研究与信息整理。所有文档均以 .docx 及 APA-7 学术排版原貌转换呈现，且支持中英双语，提供.pdf下载。
             </li>
             <li>
               <b>FreeLand</b>：
@@ -157,42 +157,6 @@
               <a class="inline-link" href="https://csfs64.github.io/KFN/#/article/gray-zone" target="_blank" rel="noopener">“灰色地带”计划</a>是 Kalyna OSINT 于2026年2月12日启动的项目。灰色地带概念已经随战争形态变化而发生偏移，而我们的目标是更新公众对“灰色地带”的理解框架，推动OSINT社区转变在开源分析中对“灰色地带”的定义。此文章归档于<a class="inline-link" href="https://csfs64.github.io/KFN/" target="_blank" rel="noopener">Kalyna 前线笔记</a>，详细信息见下文。
             </li>
           </ul>
-          
-          <!-- 更新与分析 -->
-          <section class="section-box">
-            <div class="section-head">
-              <span class="section-tag">SECTION</span>
-              <h2 id="updates" class="section-title">更新与分析（Updates）</h2>
-            </div>
-            <div class="section-body">
-              <!-- 筛选器（按平台/标签） -->
-              <div class="updates-controls" aria-label="Updates Filters">
-                <select id="filterPlatform" aria-label="按平台筛选">
-                  <option value="">全部平台</option>
-                  <option value="Zhihu">Zhihu</option>
-                  <option value="X">X (Twitter)</option>
-                  <option value="Bilibili">Bilibili</option>
-                  <option value="FreeLand">FreeLand</option>
-                </select>
-                <input id="filterTag" type="search" placeholder="关键词搜索（标题/摘要/标签）" aria-label="关键词搜索">
-                <button type="button" id="filterApply" class="copy-btn">筛选</button>
-                <button type="button" id="filterReset" class="copy-btn">重置</button>
-              </div>
-          
-              <!-- 列表容器 -->
-              <div id="updatesList" class="updates-grid" role="list"></div>
-          
-              <!-- 分页/加载更多 -->
-              <div class="updates-more center">
-                <button type="button" id="updatesLoadMore" class="copy-btn" hidden>加载更多</button>
-              </div>
-          
-              <!-- 说明 -->
-              <div class="box note" style="margin-top:10px;">
-                <b>提示：</b>点击蓝色标题或“阅读原文”可阅读全文；点击“加载更多”查看早期/相关分析；更多文章请前往我们在各社交平台的官方账号。
-              </div>
-            </div>
-          </section>
 
           <!-- 工具与资源 -->
           <h2 id="Resources" class="highlight-yellow">工具与资源（Resources）</h2>
@@ -256,6 +220,42 @@
             这样可以清晰展示作者、数据来源与时间。
             引用数据名称时，可直接使用上文中小标题（例如：<i>Sentinel Hub, 2025-10-21, 链接</i>）。
           </div>
+
+          <!-- 更新与分析 -->
+          <section class="section-box">
+            <div class="section-head">
+              <span class="section-tag">SECTION</span>
+              <h2 id="updates" class="section-title">更新与分析（Updates）</h2>
+            </div>
+            <div class="section-body">
+              <!-- 筛选器（按平台/标签） -->
+              <div class="updates-controls" aria-label="Updates Filters">
+                <select id="filterPlatform" aria-label="按平台筛选">
+                  <option value="">全部平台</option>
+                  <option value="Zhihu">Zhihu</option>
+                  <option value="X">X (Twitter)</option>
+                  <option value="Bilibili">Bilibili</option>
+                  <option value="FreeLand">FreeLand</option>
+                </select>
+                <input id="filterTag" type="search" placeholder="关键词搜索（标题/摘要/标签）" aria-label="关键词搜索">
+                <button type="button" id="filterApply" class="copy-btn">筛选</button>
+                <button type="button" id="filterReset" class="copy-btn">重置</button>
+              </div>
+          
+              <!-- 列表容器 -->
+              <div id="updatesList" class="updates-grid" role="list"></div>
+          
+              <!-- 分页/加载更多 -->
+              <div class="updates-more center">
+                <button type="button" id="updatesLoadMore" class="copy-btn" hidden>加载更多</button>
+              </div>
+          
+              <!-- 说明 -->
+              <div class="box note" style="margin-top:10px;">
+                <b>提示：</b>点击蓝色标题或“阅读原文”可阅读全文；点击“加载更多”查看早期/相关分析；更多文章请前往我们在各社交平台的官方账号。
+              </div>
+            </div>
+          </section>
 
           <!-- 如何参与 -->
           <section class="section-box">
