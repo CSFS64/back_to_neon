@@ -1,5 +1,15 @@
 [
   {
+    "id": "https://www.zhihu.com/pin/2010821401607696612",
+    "title": "Kalyna OPTO 10寸光纤FPV 的短距离飞行测…",
+    "date": "2026-02-27",
+    "platform": "Zhihu",
+    "url": "https://www.zhihu.com/pin/2010821401607696612",
+    "image": "",
+    "tags": [],
+    "excerpt": "Kalyna OPTO 10寸光纤FPV 的短距离飞行测试，采用自研1080P30网络视频包光纤图传和自研HUD叠加系统，我们将在未来（预计一个月内）公布更多信息。"
+  },
+  {
     "id": "https://www.zhihu.com/pin/2010776892781896350",
     "title": "在上一次更新（战术无人机通识 1/n ）中…",
     "date": "2026-02-27",
@@ -88,15 +98,5 @@
     "image": "",
     "tags": [],
     "excerpt": "经过一段时间的酝酿，我们第二篇长篇报告已正式出炉，还请各位读者批评指正。"
-  },
-  {
-    "id": "https://www.zhihu.com/pin/1990158443001159951",
-    "title": "我们的互动地图Kalyna Battle Map推出了…",
-    "date": "2026-01-01",
-    "platform": "Zhihu",
-    "url": "https://www.zhihu.com/pin/1990158443001159951",
-    "image": "https://pic2.zhimg.com/50/v2-b3bb8e7aa87c975386cde20a83ff1ef5.jpg",
-    "tags": [],
-    "excerpt": "我们的互动地图Kalyna Battle Map推出了所有人都可添加的地图批注功能，目前计划仍在内测阶段，更多功能将完善： 你可以通过双击地图上的任何地方添加批注，批注将在审核通过后显示在地图上。 任何人都可以看到你添加的批注，你也可以看到任何人添加并通过审核的批注。 你可以添加任何有关战争的内容，不论是事件定位、区域事件还是国际新闻。 —————— 你可以"
   }
 ]
