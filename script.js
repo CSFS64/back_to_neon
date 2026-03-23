@@ -187,7 +187,7 @@ function copyTemplate(btn){
   if (!box || !panel || !btn || !frame) return;
 
   // 让被嵌入页按你的 embed 规则渲染；autoShow=1 维持 trench 等默认显示
-  const MAP_URL = 'https://csfs64.github.io/test2/?embed=1&autoShow=1';
+  const MAP_URL = 'https://map.kalyna.homes/?embed=1&autoShow=1';
 
   const MIN_H = 220, MAX_H = 520;
   let loaded = false;
